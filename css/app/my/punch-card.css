@@ -1,0 +1,44 @@
+.user-header{height:56px}
+.user-portrait .portrait-img, .portrait-userinfo{height: 40px;margin: 0 0 0 15px;width: 40px;}
+.portrait-userinfo{width: auto;}
+.user-portrait .portrait-name{height: 25px;line-height: 25px;font-size: 16px;}
+.user-portrait .portrait-job{height: 15px;line-height: 15px;font-size: 12px;}
+.dot, .dot2, .dot3{position: relative;margin: 0 auto;}
+.punch-card{
+    bottom: 50px;width: 100%;height: 100px;position: fixed;z-index: 10;right: 0;left: 0;
+}
+.dot ul{margin: 0px;}
+.dot li.one{height: 50px;line-height: 70px;}
+.dot li{height: 50px;line-height: 30px;}
+.date{height: 40px;line-height: 40px;padding-top: 10px;}
+.spn-date{
+width: 120px;background-color: #1F9B53;color: #FFFFFF;display: block;height: 30px;line-height: 30px;
+margin-top: 0px;border-radius: 0 17px 17px 0;
+}
+.monthDay{margin: 0px 8px;}
+/*时间线*/
+#cd-timeline{margin-top: 0px;}
+#cd-timeline::before {top:0px;margin-top: 10px;}
+.cd-timeline-img{width: 32px;height: 32px;}
+.cd-container{width: 100%;}
+.worktag{font-size: 11px;text-align:center;padding:4px 2px 2px 2px;color: #FFFFFF;width: 30px;height: 30px; word-wrap:break-word;line-height: 12px;display: block;}
+.cd-timeline-img.cd-picture{left: 15px;top: 24px;margin: 0px;}
+.cd-timeline-content::before{border: none;}
+.cd-timeline-content{margin-left: 60px;padding-top: 0.8em;}
+#cd-timeline::before{margin-top: 0px;left: 30px;}
+.cd-timeline-content{box-shadow: none;}
+.cd-timeline-content .timeline-head{height: 28px;line-height: 28px;}
+.cd-timeline-content .timeline-head span{color: #9A9A9A;font-size: 14px;margin-right: 6px;}
+.div-address{color: #ACB0BE;font-size: 12px;}
+.cd-timeline-img.cd-picture.first{}
+.cd-timeline-block{margin: 0.5em 0 0 0;}
+.mui-scroll-wrapper.timeline{top:146px;}
+.div-address i.mui-icon{font-size: 14px;margin-right: 2px;color: black;}
+.cd-timeline-content .timeline-head span.mui-badge{font-size: 12px;margin-top: 5px;line-height: 0.85;color: #FFFFFF;}
+/**/
+.cd-timeline-block:first-child:before{top:0px;}
+.cd-timeline-block:before{left:29px;height: 120px;bottom: -30px;}
+/*时间线end*/
+.emptyinfo{text-align: center;width: 100%;color: #B9B9B9;margin-top:80px;}
+.emptyinfo span.mui-icon{color: #A7D0F8;font-size: 56px;margin-bottom: 20px;} 
+.hezi{display:inline-block;height:40px;width:60px;}

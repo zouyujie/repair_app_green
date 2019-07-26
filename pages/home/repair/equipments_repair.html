@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<title>备件库存信息</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" href="../../../css/mui.min.css">
+		<link href="../../../css/base.css" rel="stylesheet" />
+		<style type="text/css">
+			.fontcolor {
+				color: #000000;
+			}
+			
+			.kc {
+				float: right;
+				padding-right: 10%;
+			}
+			
+			.pleft {
+				padding-top: 7px;
+			}
+			
+			.pspan {
+				float: right;
+				padding-right: 15%;
+			}
+			
+			.fontspan {
+				float: right;
+				color: #FFFFFF;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="app" class="mui-content">
+			<div v-show="isEmptyData" class="empty-container" v-cloak>
+				<div class="nodata-info">暂无相关内容</div>
+				<div class="nodata-icon"><span class="mui-icon iconfont icon-wuneirong"></span></div>
+			</div>
+			<ul v-show="list.length>0"  class="mui-table-view" style="margin-top:0px;" v-for="(item,index) in list" v-cloak>
+				<li class="mui-table-view-cell mui-media">
+					<div class="mui-media-body">
+						<p class="fontcolor">{{item.EQ_PART_NAME}}
+							<span class="kc">库存：
+									<a><span v-text="item.TOTAL"></span>{{item.UNIT}}</a>
+							</span>
+						</p>
+						<p class="mui-ellipsis pleft">{{item.MODEL}}<span class="pspan"><span class="mui-badge fontspan" v-bind:class="{'mui-badge-green':item.TOTAL>0}"><span v-if="item.TOTAL<1">无货</span>
+							<span v-if="item.TOTAL>0">有货</span></span>
+							</span>
+						</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<script src="../../../js/mui.min.js"></script>
+		<script src="../../../js/libs/vue.min.js"></script>
+		<script src="../../../js/common/config.js"></script>
+		<script src="../../../js/common/global.js"></script>
+		<script type="text/javascript">
+			var app = new Vue({
+				el: "#app",
+				data: {
+				    isEmptyData:false,
+					list: []
+				},
+				mounted: function () {
+				    var _self = this;
+				    mui.init();
+					mui.plusReady(function() {
+						var self = plus.webview.currentWebview();
+						var eqid = self.EQ_ID;
+						g.ajax(config.GetEqPartsStore, {
+							data: {
+								ORG_CODE: config.ORG_CODE,
+								EQ_ID: eqid
+							},
+							success: function(data) {
+							    if (data.Data.length == 0) {
+							        _self.isEmptyData = true;
+									//mui.toast('无备件库存信息');
+									//mui.back();
+									return;
+							    }
+							    _self.list = data.Data;
+								console.log(JSON.stringify(data))
+							}
+					});
+					});
+				},
+				methods: {
+
+				}
+			});
+		</script>
+	</body>
+
+</html>

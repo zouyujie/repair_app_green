@@ -1,0 +1,31 @@
+﻿.mui-bar-tab .mui-tab-item.mui-active {
+	color: #1F7246;
+}
+.mui-bar-tab {
+	box-shadow: none;
+}
+.footer-nav .tab-item-center{
+position:relative;
+overflow:visible;
+text-align:center;
+}
+.footer-nav .tab-item-center .plus{
+display:inline-block;
+width:100%;
+color:#fff;
+position:absolute;
+left:0;
+top:-25px;
+}
+.footer-nav .tab-item-center .plus .icon{
+width:auto;
+height:auto;
+padding:10px;
+background:#1ba9ba;
+border-radius:50%;
+border:3px solid #fff;
+box-shadow: 0 -2px 3px rgba(100,100,100,.4);
+}
+.footer-nav .tab-item-center .tab-label{
+margin-top:25px;
+}

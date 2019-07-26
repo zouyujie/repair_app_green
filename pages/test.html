@@ -1,0 +1,144 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+</head>
+<body>
+    <script type="text/javascript">
+        function fun1 () {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('Function 1')
+                    resolve()
+                }, 500)
+            })
+        }
+
+        function fun2 () {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('Function 2')
+                    resolve()
+                }, 500)
+            })
+        }
+
+        function fun3 () {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('Function 3')
+                    resolve()
+                }, 500)
+            })
+        }
+
+        async function asyncFunArr () {
+            await fun1()
+            await fun2()
+            await fun3()
+        }
+
+        asyncFunArr()
+
+        //function fun1 () {
+        //    setTimeout(() => {
+        //        console.log('Function 1')
+        //        af.next()
+        //    }, 500)
+        //}
+
+        //function fun2 () {
+        //    setTimeout(() => {
+        //        console.log('Function 2')
+        //        af.next()
+        //    }, 500)
+        //}
+        //function fun3 () {
+        //    setTimeout(() => {
+        //        console.log('Function 3')
+        //        af.next()
+        //    }, 500)
+        //}
+        //function* asyncFunArr (...fun) {
+        //    yield fun[0]()
+        //    yield fun[1]()
+        //    yield fun[2]()
+        //}
+        //const af = asyncFunArr(fun1, fun2, fun3)
+        //af.next();
+
+        //function fun1() {
+        //    return new Promise((resolve, reject) => {
+        //        setTimeout(() => {
+        //            console.log('Function 1');
+        //            resolve();
+        //        }, 500);
+        //    });
+        //}
+        //function fun2() {
+        //    return new Promise((resolve, reject) => {
+        //        setTimeout(() => {
+        //            console.log('Function 2');
+        //            resolve();
+        //        }, 500);
+        //    });
+        //}
+        //function fun3() {
+        //    return new Promise((resolve, reject) => {
+        //        setTimeout(() => {
+        //            console.log('Function 3');
+        //            resolve();
+        //        }, 500);
+        //    });
+        //}
+        //fun1().then(() => { fun2() }).then(() => { fun3() });
+
+        //fun1(); //开始调用
+
+        //function mockAsync(cb, time) { console.log("before aync......."); setTimeout(() => { console.log("after aync......."); cb(); }, time) }
+        //mockAsync(() => {
+        //    console.log("mock async 1");
+        //    mockAsync(() => {
+        //        console.log("mock async 2");
+        //        mockAsync(() => {
+        //            console.log("mock async 3");
+        //            mockAsync(() => { console.log("mock async 4"); },
+        //                1000)
+        //        }, 1000)
+        //    }, 1000)
+        //}, 1000);
+
+        //function usePromise(time) {
+        //    return new Promise((resolve, reject) => {
+        //        setTimeout(() => {
+        //            resolve();
+        //        }, time);
+        //    })
+        //};
+        //usePromise(1000).then(() =>{
+        //    console.log("use promise 1"); return usePromise(1000);
+        //}).then(() =>{
+        //    console.log("use promise 2"); return usePromise(1000);
+        //}).then(() =>{
+        //    console.log("use promise 3"); return usePromise(1000);
+        //}).then(() =>{
+        //    console.log("use promise 4");
+        //})
+        //function delay(time) {
+        //    console.log("in delay...");
+        //    return new Promise((resolve) =>{
+        //        setTimeout(() =>{ console.log("will resolve"); resolve("aaa"); }, time);
+        //    });
+        //}
+
+        //async  function asyncFn(){
+        //    return 123;
+        //}
+        //asyncFn()
+        //    .then(x => {console.log(x)})
+        //    .catch(err => console.log(error))
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/home/work-list.css" />
+        <style type="text/css">
+            .mui-plus-pullrefresh .mui-scroll {
+                position: absolute;
+                width: 100%;
+            }
+        </style>
+	</head>
+
+	<body style="background-color:#F5F5F5;">
+		<div id="app">
+			<header class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">待处理任务</h1>
+				<div class="mui-segmented-control">
+					<div class="divHeader">
+						<a v-for="(item,index) in menus" v-on:tap="getTaskList(item.name)" class="mui-control-item" v-bind:id="item.id" v-bind:class="{'mui-active': typeid==item.name}">
+							<span v-text="item.title"></span>(<span v-text="item.taskNum"></span>)
+							<span v-if="item.rad" href="#" class="round"></span>
+						</a>
+					</div>
+				</div>
+			</header>
+			<div id="pullrefresh" class="mui-content">
+				<!--<div class="divWaitDispatching" v-cloak>
+                    <button type="button" v-on:tap="dispatching()" class="mui-btn mui-xbtn-primary mui-btn-outlined b1">派工</button>
+                    <button type="button" class="mui-btn mui-xbtn-primary">立即抢单</button>
+                </div>-->
+                    <ul id="pullrefreshUl">
+                        <li>
+                            <div v-show="list.length>0" v-for="(item,index) in list" class="mui-card">
+                                <ul class="mui-table-view">
+                                    <li class="mui-table-view-cell mui-media">
+                                        <div v-on:tap="open_detail(item)">
+                                            <div class="mui-card-header">
+                                                <div><span class="spnOrderNO">工单号：</span><span class="spn-order" v-text="item.orderNumber"></span></div>
+                                                <div class="font-topright" v-text="getStatusName(item.status)"></div>
+                                                <div class="triangle-topright" v-bind:class="getStatusColorById(item.status)"></div>
+                                            </div>
+                                            <div class="mui-media-body">
+                                                <div class="middle-inner" v-bind:class="{ptop:item.hour==0}">
+                                                    <div class="div-tag" v-show="item.hour!=0">
+                                                        <button v-show="item.money!=0" type="button" class="mui-btn mui-btn-warning mui-btn-outlined"><span class="mui-icon iconfont icon-jichutubiao_jiangli"></span>奖励 ¥ <span v-text="item.money"> </span></button>
+                                                        <button v-show="item.hour!=0" type="button" class="mui-btn mui-btn-warning mui-btn-outlined"><span v-text="item.hour"> </span>小时完成</button>
+                                                    </div>
+                                                    <div class="floatLeft middle">
+                                                        <span class="fl" v-text="item.title"></span>
+                                                        <span v-if="typeid==TaskType.repair.value&&item.IS_URGENCY==1" class="mui-badge mui-badge-warning floatLeft">紧急</span>
+                                                    </div>
+                                                    <div style="clear: both;"></div>
+                                                    <p class='mui-ellipsis' v-text="item.msg"></p>
+                                                </div>
+                                            </div>
+                                            <div v-if="item.IsOverTime==1" class="font-seal">已过期</div>
+                                            <div v-if="typeid==TaskType.repair.value&&item.IS_WAITING==1" class="font-seal">待料</div>
+                                        </div>
+                                        <div class="mui-card-footer">
+                                            <span v-text="item.datetime"></span>
+                                            <div v-show="!(item.IsOverTime==1)">
+                                                <!--班组-->
+                                                <div v-if="item.status==WorkOrderStatus.waitOrder.value&&roleid==comm.leader" class="divWaitDispatching" v-cloak>
+                                                    <button type="button" v-on:tap="dispatching(item,'P',true)" class="mui-btn mui-xbtn-primary mui-btn-outlined b1">派工</button>
+                                                    <button type="button" v-show="item.CREATE_USER_ID != config.USER_ID" v-on:tap="grabOrder(item)" class="mui-btn mui-xbtn-primary">立即抢单</button>
+                                                </div>
+                                                <button v-if="item.status==WorkOrderStatus.waitOrder.value&&roleid==comm.pm" type="button" class="mui-btn mui-xbtn-primary" v-on:tap="dispatching(item,'P',true)">派工</button>
+                                                <button type="button" v-if="(item.status==WorkOrderStatus.waitSignin.value||item.status==WorkOrderStatus.waitOver.value)&&roleid==comm.pm" class="mui-btn mui-xbtn-primary mui-btn-outlined" v-on:tap="dispatching(item,'Z',true)">转单</button>
+                                                <button type="button" v-if="item.status==WorkOrderStatus.waitSignin.value&&item.ACCEPT_USER_ID==config.USER_ID" class="mui-btn mui-xbtn-primary" v-on:tap="signin(item)">签到</button>
+                                                <button type="button" v-if="item.status==WorkOrderStatus.waitOver.value&&item.ACCEPT_USER_ID==config.USER_ID" class="mui-btn mui-xbtn-primary" v-on:tap="overWork(item)" v-bind:disabled="item.IS_WAITING==1">完工</button>
+                                                <button type="button" v-if="!(typeid==TaskType.repair.value)&&showAudit(item)" class="mui-btn mui-xbtn-primary" v-on:tap="audit(item)">评价</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-show="isEmptyData" class="empty-container">
+                                <div class="nodata-info">暂无工单信息</div>
+                                <div class="nodata-icon"><span class="mui-icon iconfont icon-gongdan"></span></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+		</div>
+		<div id="popover" class="mui-popover mui-popover-bottom mui-popover-action">
+			<div class="divHeader">
+				执行人员选择
+				<a href="#popover"><span class="mui-icon mui-icon-closeempty f-rigth"></span></a>
+			</div>
+			<div class="mui-scroll-wrapper" id="mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<ul class="mui-table-view do-persons">
+						<li v-for="(item,index) in list" class="mui-table-view-cell" v-cloak>
+							<span v-html="item.typeName"></span>
+							<div class="mui-radio mui-right f-rigth">
+								<input name="cbx" v-bind:id="'cbx_'+item.id" v-bind:value="item.id" type="radio">
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="divFooter">
+				<button v-on:tap="btnSure()" class="mui-btn next-btn mui-btn-lightBlue">确认</button>
+			</div>
+		</div>
+		<script type="text/javascript" src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+
+		<script type="text/javascript" src="../../js/common/web-storage-cache.js"></script>
+		<script type="text/javascript" src="../../js/app/home/work-list.js"></script>
+		<script type="text/javascript" src="../../js/app/home/divWaitDispatching.js"></script>
+		<script type="text/javascript">
+            var _database = new smpWebSql();
+			var ow = null;
+			var old_back = mui.back;
+			var app = new Vue({
+				el: "#app",
+				data: app_Data,
+				methods: {
+					//显示评价
+					showAudit: function(item) {
+						return item.status == WorkOrderStatus.waitAudit.value && ((item.CREATE_USER_ID == config.USER_ID && app.typeid == TaskType.repair.value) || app.typeid != TaskType.repair.value);
+					},
+					//派工/转单
+					dispatching: function (item,tag,isDel) {
+					    if (persons.list.length == 0) {
+					        mui.toast('暂无派工人员信息');
+					        return;
+					    }
+						persons.NO = item.orderNumber;
+						persons.typeid = app.typeid;
+						persons.isDel = isDel;
+						if (tag != undefined) {
+						    persons.operationType = tag;
+						}
+						if (app.list.length <3) {
+						    document.getElementById('pullrefresh').style.height = g.getScreenInfo('height') + 1 + 'px'; //classList.contains('mui-active')
+						}
+						window.scrollTo(1, 1);
+						mui('#popover').popover('toggle'); //show hide toggle
+						persons.getUsers(persons);
+					},
+					//根据主题获取颜色
+					getStatusColorById: function(status) {
+						return g.getStatusColorById(status);
+					},
+					//根据ID获取状态名
+					getStatusName: function(statusid) {
+					    return  g.getStatusNameById(statusid, true);
+					},
+					//拍照签到
+					signin: function(item) {
+						signinFun(app.typeid, item, '', 'index');
+					},
+					//完工
+					overWork: function(item) {
+						overWorkFun(item, '');
+					},
+					//审核评价
+					audit: function(item) {
+						var _url =app.typeid + '/sure.html';
+						g.openWindow({
+							id: 'repair_sure',
+							url: _url,
+							extras: {
+								NO: item.orderNumber,
+								typeid: app.typeid,
+								tag: ''
+							}
+						});
+					},
+					//抢单
+					grabOrder: function(item) {
+						grabOrderFun(item);
+					},
+					//打开详情页面
+					open_detail: function(item) {
+						open_detailFun(item, 'waitdo');
+					},
+					//根据类型获取任务列表
+					getTaskList: function (typeid) {
+					    persons.typeid = typeid;
+					    persons.getUsers(persons);
+						getTaskListFun(typeid);
+					}
+				},
+				mounted: function() {
+				    var _self = this;
+				    //_self.menus = [{ "id": 5, "name": "repair", "title": "维修", "taskNum": 12, "rad": true }, { "id": 7, "name": "maintain", "title": "保养", "taskNum": 7, "rad": true }, { "id": 6, "name": "polling", "title": "巡检", "taskNum": 175, "rad": true }, { "id": 4, "name": "alarm", "title": "报警", "taskNum": 12, "rad": true }];
+					mui.ready(function() {
+						window.addEventListener('tap', function() {
+							if(document.getElementById("popover")) {
+							    if (!document.getElementById("popover").classList.contains('mui-active')) {
+							        var _height=document.getElementById('pullrefresh').style.height;
+							        //console.log('height:' + _height)
+							        if (_height) {
+							        	//console.log('parseInt(_height) '+parseInt(_height))
+							            document.getElementById('pullrefresh').style.height = 'auto';
+							            //console.log("document.getElementById('pullrefresh').style.height" + document.getElementById('pullrefresh').style.height)
+							        }
+								}
+							}
+						});
+					})
+					mui.plusReady(function() {
+						//console.log('plusReady')
+						var vw = plus.webview.currentWebview();
+						ow = vw.opener();
+						//重写返回逻辑，返回时刷新父页面待处理任务数
+						mui.back = function() {
+							ow.evalJS("app.loadTaskNum()"); //刷新任务数
+							old_back();
+						}
+						//前页传入的数据，直接渲染，无需等待ajax请求详情后
+						_self.typeid = vw.typeid;
+						persons.typeid = vw.typeid;
+						persons.getUsers(persons);
+						//console.log('typeid:' + vw.typeid)
+						_self.menus = vw.headData;
+						getListAll('waitdo');
+						//_self.toList(app.typeid);
+						var _url = _self.typeid + "/order-detail.html";
+						currentPreVw = mui.preload({
+							id: _self.typeid + "_order-detail",
+							url: _url
+						});
+					});
+				}
+			});
+			//回调更新,刷新界面(增减工单数，工单号，状态值,是否移除记录）
+			function refleshView(val, no, status,typeid,isDel,userid) {
+			    if (app.menus.length > 0) {
+			        var _index = g.getIndexByTypeId(typeid);
+			        var taskNum = app.menus[_index].taskNum;
+			        if (taskNum) {
+			            var preTaskNum = parseInt(taskNum);
+			            if (preTaskNum > 0 && val != undefined) {
+			                var suffTaskNum = preTaskNum - val;
+			                var curItem = app.menus[_index];
+			                curItem.taskNum = suffTaskNum;
+			                Vue.set(app.menus, _index, curItem);
+			            }
+			        }
+			        if (no) {
+			            if (status && app.list.length > 0) {
+			                var curOrder = null;
+			                for (var i = 0; i < app.list.length; i++) {
+			                    if (no == app.list[i].orderNumber) {
+			                        if (isDel == true) { //移除记录
+			                            app.list.splice(i, 1);
+			                        }
+			                        else {
+			                            curOrder = app.list[i];
+			                            curOrder.status = status;
+			                            if (status == WorkOrderStatus.waitSignin.value) {//如果是抢单操作
+			                                curOrder.ACCEPT_USER_ID = userid == undefined ? config.USER_ID : userid;
+			                            }
+			                            Vue.set(app.list, i, curOrder);
+			                        }
+			                        break;
+			                    }
+			                }
+			                
+			            }
+			        }
+			    }
+			}
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>意见反馈</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/feedback-page.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+		<style type="text/css">
+			.mui-content,
+			html {
+				background-color: #F5F5F5;
+			}
+			
+			.mui-input-row {
+				background-color: #ffffff;
+			}
+		</style>
+	</head>
+
+	<body class="feedback">
+		<div id="app">
+			<nav class="mui-bar mui-bar-tab">
+				<button type="button" class="btnSubmit mui-btn mui-btn-lightBlue mui-btn-block" v-on:tap="btnSubmit()">提交</button>
+			</nav>
+			<div class="mui-content">
+				<div class="row"><textarea maxlength="100" v-model="data_d.CONTENT" class="mui-input-clear question" placeholder="请详细描述您的问题和意见..."></textarea></div>
+				<div class="textarea-footer"><span v-text="data_d.CONTENT.length"></span><span>/100</span></div>
+				<div class="line"></div>
+				<div class="textarea-head bg-white">图片(<i id='sltImgEl'>0</i>/3)</div>
+				<div class="collapse-content" style="height: 65px;">
+					<label class="row-label"></label>
+					<div id='F_SMPS' class="row image-list">
+						<a id="F_SMP" onclick="showActionSheet({id:'F_SMP',multiple:true,imgCount:3,callBackFun:app.updateSltImgCount})">
+							<span class="mui-icon mui-icon-camera paizhao"></span>
+						</a>
+					</div>
+				</div>
+				<div class="line" style="margin-top: 25px;"></div>
+				<div class="mui-input-row">
+					<label>联系方式</label><input v-model="data_d.TEL" type="text" class="mui-input-clear contact" placeholder="QQ或手机号" />
+				</div>
+				<div class="div-declare">我们会仔细阅读您的反馈，并且尽早给您回复，如果您有紧急问题需要咨询或者协助，可以打客服电话0755-8888888，感谢您的理解和支持</div>
+			</div>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+		<script type="text/javascript" src="../../js/libs/multipleUploader.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			var app = new Vue({
+				el: "#app",
+				data: {
+					curImgCount: 0,
+					list: [],
+					data_d: {
+						CONTENT: ''
+					}
+				},
+				mounted: function() {
+					var _self = this;
+					_self.list = [{
+						title: '如何查看保养参数',
+						content: '通过mui.preload()方法预加载，可立即返回对应webview的引用，但一次仅能预加载一个页面；若需加载多个webview，则需多次调用mui.preload()方法；'
+					}];
+				},
+				methods: {
+					btnSubmit: function() {
+						if(sltImgCount == 0) {
+							mui.toast('请上传图片');
+							return;
+						} else {
+							uploadimge(config.uploadImgUrl, config.USER_ID, fun);
+						}
+					},
+					//更新选中图片数量
+					updateSltImgCount: function(id, val) {
+						console.log('回调' + id + "," + val)
+						document.getElementById(id).innerText = val;
+					}
+				}
+			});
+	//图片上传成功、回调添加数据
+			var fun = function(d) {
+				if(d == null || JSON.parse(d).Data.length == 0) {
+					mui.toast('请上传图片');
+					return;
+				}
+				var img = '';
+				for(var i = 0; i < JSON.parse(d).Data.length; i++) {
+					console.log(JSON.parse(d).Data[i].code);
+					img += JSON.parse(d).Data[i].code + ',';
+				}
+
+				g.ajax(config.AddProductComplaint, {
+					data: {
+						ORG_CODE: config.ORG_CODE,
+						CONTENT: app.data_d.CONTENT,
+						TEL: app.data_d.TEL,
+						USERID: config.USER_ID,
+						FILE_PATH: img
+					},
+					success: function(data) {
+						if(data.Data == 1) {
+							mui.toast('操作成功');
+							mui.back();
+						}
+					}
+				})
+			}
+			//解决软键盘覆盖文本框的问题
+			window.addEventListener('resize', function() {
+				bindAndroidScroll();
+			})
+		</script>
+	</body>
+
+</html>

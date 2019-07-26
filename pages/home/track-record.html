@@ -1,0 +1,115 @@
+﻿<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>跟踪记录</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="../../css/mui.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/iconfont.css"/>
+		<link rel="stylesheet" href="../../css/app/home/timeline.css" />
+	</head>
+
+	<body>
+		<div id="app" class="mui-content" style="background-color: #FFFFFF;">
+            <div v-show="isEmptyData" class="empty-container" v-cloak>
+                <div class="nodata-info">暂无相关内容</div>
+                <div class="nodata-icon"><span class="mui-icon iconfont icon-wuneirong"></span></div>
+            </div>
+			<section v-show="list.length>0" id="cd-timeline" class="cd-container" v-cloak>
+				<div v-for="(item,index) in list" class="cd-timeline-block">
+					<div class="cd-timeline-img" v-bind:class="[index==0?'cd-picture':'cd-movie']"></div>
+					<div class="cd-timeline-content">
+						<div v-text="item.text"></div>
+						<div class="cd-date" v-text="item.t"></div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<script src="../../js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script src="../../js/common/config.js"></script>
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+		<script src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+		<script type="text/javascript">
+            var _database = new smpWebSql();
+			var vm = new Vue({
+				el: '#app',
+				data: {
+				    isEmptyData:false,
+					list: []
+				},
+				mounted: function () {
+				    mui.init();
+				    //this.list = [{ "text": "用户4，工单结束", "t": "2018-05-22 14:33:58" }, { "text": "用户4，工作人员到场签到", "t": "2018-05-22 14:33:44" }, { "text": "用户4，分配工作人员", "t": "2018-05-22 14:33:34" }, { "text": "用户4，提交报修单", "t": "2018-05-21 18:06:44" }];
+					//this.list=appdata.trackRecord; //test
+					mui.plusReady(function() {
+					    var self = plus.webview.currentWebview();
+					    //console.log('self.NO:' + self.NO);
+					    if (config.isMock) {
+					        _database.read('tb_billexecute_g', "where BILL_NO='" + self.NO + "' and BUSINESS_TYPE='R'", function (res) {
+					            var data= {
+					                "StatusCode": 200,
+					                "Message": null,
+					                "Data": res
+					            };
+					            console.log('GetBillExecute:' + JSON.stringify(data))
+					            if (data.Data.length == 0) {
+					                vm.isEmptyData = true;
+					            } else {
+					                var dv = [];
+					                for (var i = 0; i < data.Data.length; i++) {
+					                    var d = {};
+					                    var uname = '';
+					                    if (data.Data[i].UserName) {
+					                        uname = data.Data[i].UserName + '，';
+					                    }
+					                    d.text = uname + data.Data[i].RESULT;
+					                    d.t = g.formatDate(data.Data[i].CREATE_TIME, 'YMDHMS');
+					                    dv.push(d);
+					                }
+					                vm.list = dv.reverse();
+					                console.log(JSON.stringify(vm.list))
+					            }
+					        });
+					    } else {
+					        g.ajax(config.GetBillExecute, {
+					            type: 'post',
+					            data: {
+					                BILL_NO: self.NO
+					            },
+					            // nwaiting: nwaiting,
+					            success: function (data) {
+					                console.log('GetBillExecute:' + JSON.stringify(data))
+					                if (data.Data.length == 0) {
+					                    vm.isEmptyData = true;
+					                    //mui.toast('无跟踪记录');
+					                    //mui.back();
+					                } else {
+					                    var dv = [];
+					                    for (var i = 0; i < data.Data.length; i++) {
+					                        var d = {};
+					                        var uname = '';
+					                        if (data.Data[i].UserName) {
+					                            uname = data.Data[i].UserName + '，';
+					                        }
+					                        d.text = uname + data.Data[i].RESULT;
+					                        d.t = g.formatDate(data.Data[i].CREATE_TIME, 'YMDHMS');
+					                        dv.push(d);
+					                    }
+					                    vm.list = dv.reverse();
+					                    console.log(JSON.stringify(vm.list))
+					                }
+					            }
+					        })
+					    }
+					});
+				}
+			})
+		</script>
+	</body>
+
+</html>

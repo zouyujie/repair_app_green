@@ -1,0 +1,68 @@
+/**
+ * 首页采用了rem响应式布局 zouqj 2017-09-11
+ */
+html {font-size: 12px;}/*设备像素比为1的时候，字体大小为12px;*/		
+[data-dpr="2"] html {font-size: 24px;}/*设备像素比为2的时候，字体大小为24px;*/		
+[data-dpr="3"] html {font-size: 36px;}/*设备像素比为3的时候，字体大小为36px;*/
+body{background-color: #ffffff;}
+.mui-content{background-color: #FFFFFF;background-size: 100%;}
+.mui-grid-view.mui-grid-9.light-bg{background-color: #66B96A;}
+.index_Title{font-size: 16px;color: white;padding: 0.468rem 0px 0.5rem 0px;}
+.waitTask{margin-top: 1rem;font-size:14px;}
+.waitTask >span{font-size: 2rem;}
+.divInfo{margin-top: 0.3rem;font-size: 0.35rem;}
+.divBtn{margin: 0.3rem;}  
+.mui-grid-view.noBorder{border-top: 0 solid #eee;border-left: 0 solid #eee;}
+.mui-grid-view.mui-grid-9 .mui-table-view-cell.no-border-bottom{border-bottom:0px;color: white;}
+.mui-grid-view.mui-grid-9 .mui-table-view-cell.no-border-top{border-bottom:0px;color: white;}
+.mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body.font-white{color: white;}
+.font-Tag{font-size:0.69rem;}
+.mui-grid-view.mui-grid-9{background-color: #FFFFFF;}
+.mui-table-view{background-color: #F5F5F5;}
+.user-header-bottom {
+    position: relative;margin-top:0.3rem;margin-bottom: 0;padding-left: 0;line-height: 1.2rem;text-align: center;background-color: #66B96A;color: #FFFFFF;
+}
+.user-header {height: 8rem;background-color: #348D7F;color: #FFFFFF;margin: 0 auto;text-align: center;}
+.user-header .user-header-bottom a { 
+    display: block;float: left;line-height: 0.5rem;font-size: 14px;color: #fff;text-align: center;position: relative;margin-top: 0rem; /*width: 25%;*/
+}
+.user-header-bottom .vertical-bar:after {
+	content: ' ';height: 1rem;border-left: 1px solid #66B96A;position: absolute;top: 0rem;right: 0;
+}
+.user-header-bottom span{color: white;}
+.user-header-bottom p{font-size:0.35rem;color: white;margin-bottom: 0rem;}
+.mui-btn-primary{
+	background-color: #66B96A;border: 1px solid #217346;font-size: 0.5rem; border-radius: 22px;width:3.5rem;height: 1rem;
+}
+.mui-grid-view.mui-grid-9 .mui-media .mui-icon{
+	width: 56px;height: 56px;line-height: 56px;color: white;font-size:2em;border-radius:4px;
+}
+.topBtn{top:0.33rem;right: 15px;position: absolute;z-index: 2;}
+.mui-xbtn-primary {
+    background-color: #66B96A;border: 1px solid #217346;font-size: 14px;border-radius: 4px;width: 64px;height: 30px;color: #FFFFFF;
+}
+.mui-table-view-cell{padding: 0px 0px 0px 10px;}
+.mui-grid-view.mui-grid-9 .mui-table-view-cell {  padding: 0.27rem 0.468px;}
+.mui-grid-view.mui-grid-9 .mui-table-view-cell>a:not(.mui-btn) {margin: 0;padding: 0.312rem 0;}
+.user-header-bottom a:last-child:after{border-left:0px;}
+.mui-icon .mui-badge{background: #FF4F51;}
+/*报表*/
+.div-pie{height:4.9rem;background-color:white;}
+.chart{height:4.9rem;margin: 0px;padding: 0px;}
+.smp-search-success {
+	width: 100%;text-align: center;color: #999;text-align: left;
+    padding-left: 15px;height: 38px;line-height:38px;font-size: 12px;background-color: #FFFFFF;position:absolute;
+}
+.smp-search-success span {
+    float: left;
+    font-size: 12px;line-height: 38px;
+}
+.rectangle{margin-top:10px;}
+
+.div-totalTaskNum{    position: absolute;
+    left: 46px;
+    color: #348D7F;
+    top: 3.5rem;position: absolute;font-size:14px;}
+.div-totalTaskNum .totalTaskNum{color:#348D7F;font-size:1.2rem;font-weight:bold;margin:0px 4px;}
+.div-dotask{position:relative;display:block;left:25px; z-index: 9999;width: 80px;
+    bottom: 39px;}

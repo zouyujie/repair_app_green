@@ -1,0 +1,35 @@
+﻿@charset "UTF-8";
+/**
+ * Created by zouqj on 2017-09-04 11:40:35
+ */
+body,.mui-content{line-height: 1.2;background-color: #FFFFFF;}
+.mui-bar-nav {background-color: #348D7F;}
+.mui-title{color: white;}
+/* logo */
+.login-div{margin-top: 40px;padding: 0 1rem;width: 100%;text-align: center;}
+.login-logo {
+	margin: 0 auto;border-radius: 20px;border-bottom-color: beige;
+}
+.area {margin: 20px auto 0px auto;}
+.mui-input-group {margin-top: 40px; padding: 0 15px;}
+.mui-input-group:before,.mui-input-group:after{height: 0;}
+.mui-input-group .mui-input-row:after{right: 15px;}
+.mui-input-group:first-child {margin-top: 20px;}
+.mui-input-group label {width: 23%;}
+.mui-input-row label~input,
+.mui-input-row label~select,
+.mui-input-row label~textarea {width: 77%;/*line-height: 1.5em;margin-top: 0.25em;*/}
+/*.mui-input-row label{margin-top: 0.25em;}*/
+.mui-checkbox input[type=checkbox],
+.mui-radio input[type=radio] {top: 6px;}
+.mui-content-padded {margin: 40px 30px 10px 30px;}
+.mui-btn {padding: 10px;}
+.link-area {display: block;margin-top: 25px;text-align: center;}
+.spliter {color: #bbb;padding: 0px 8px;}
+.mui-btn-primary{
+    background-color: #66B96A;border: 1px solid #C6EFCE;
+    font-size: 16px;border-radius: 4px;height: 40px;
+}
+.center{width: 100%;text-align: center;margin: 0 auto;}
+.mui-placeholder {pointer-events: none;}
+.mui-input-group .mui-input-row{height: auto;}

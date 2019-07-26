@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="css/mui.min.css" rel="stylesheet" />
+    <link href="css/iconfont.css" rel="stylesheet" />
+    <link href="css/app/index.css" rel="stylesheet" />
+</head>
+
+<body>
+    <nav id="app" class="mui-bar mui-bar-tab footer-nav">
+        <a v-for="(item,index) in tabbar" v-bind:id="item.id" class="mui-tab-item" v-bind:class="{'mui-active': !index}" v-bind:data-id="item.url">
+            <span class="mui-icon" v-bind:class="item.icon"></span>
+            <span class="mui-tab-label">{{item.title}}</span>
+        </a>
+    </nav>
+    <div class="mui-content"></div>
+    <script src="js/mui.min.js"></script>
+    <script src="js/libs/vue.min.js"></script>
+    <script type="text/javascript" src="js/common/config.js"></script>
+    <!--<script src="js/common/webSql.js"></script>
+    <script src="js/libs/mock-min.js"></script>
+    <script src="js/common/mockdata.js"></script>-->
+    <script src="js/common/global.js"></script>
+    <script src="js/app/my/appupdate.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+           var firstTabbar = null;
+		    mui.init();
+			var aniShow = {}; //动画显示
+			var activeTab = '';
+			var views = {};
+			var app = new Vue({
+				el: '#app',
+				data: {
+					initIndex: 0, //[初始化参数]
+					tabbar: [],
+					subStyle: {
+						top: '0px',
+						bottom: '51px'
+					}
+				},
+				mounted: function() {
+					mui.init({
+						swipeBack: true //启用右滑关闭功能
+					});
+					var self = this; // Vue实例化对象
+					// 初始化
+					mui.plusReady(function() {
+					    views = plus.webview.currentWebview();
+					    self.tabbar = smp_menu.getFrstLevelMenus();
+						if(smp_menu == undefined || self.tabbar == undefined || self.tabbar == null || self.tabbar == '' || JSON.stringify(self.tabbar[0]) == '{}') {
+							localStorage.removeItem('$loginstate');
+							console.log('已退出')
+							return;
+						}
+						var length = self.tabbar.length;//菜单长度
+						var _tabbar = self.tabbar[0];
+						var sub = plus.webview.create(_tabbar.url, _tabbar.url, self.subStyle); 
+						firstTabbar = sub;
+						var temp = {};
+						temp[0] = "true";
+						mui.extend(aniShow, temp); //合并对象
+						views.append(sub);
+						activeTab = self.tabbar[0].url; //当前激活选项
+
+						localStorage.removeItem('$EXE_COUNT'); //移除列表显示条目
+					    //appUpdate();//检测app更新
+					    // ---------------------中间凸起图标绘制开始------------------------------
+						var leftPos = Math.ceil((window.innerWidth - 60) / 2); // 设置凸起大图标为水平居中
+					    /**	
+                         * drawNativeIcon 绘制带边框的半圆，
+                         * 实现原理：
+                         *   id为bg的tag 创建带边框的圆
+                         *   id为bg2的tag 创建白色矩形遮住圆下半部分，只显示凸起带边框部分
+                         * 	 id为iconBg的红色背景图
+                         *   id为icon的字体图标
+                         *   注意创建先后顺序，创建越晚的层级越高
+                         */
+						var drawNativeIcon = g.drawNative('icon', {
+						    bottom: '5px',
+						    left: leftPos + 'px',
+						    width: '60px',
+						    height: '60px'
+						}, [{
+						    tag: 'rect',
+						    id: 'bg',
+						    position: {
+						        top: '1px',
+						        left: '0px',
+						        width: '100%',
+						        height: '100%'
+						    },
+						    rectStyles: {
+						        color: '#fff',
+						        radius: '50%',
+						        borderColor: '#ccc',
+						        borderWidth: '1px'
+						    }
+						}, {
+						    tag: 'rect',
+						    id: 'bg2',
+						    position: {
+						        bottom: '-0.5px',
+						        left: '0px',
+						        width: '100%',
+						        height: '45px'
+						    },
+						    rectStyles: {
+						        color: '#F5F5F5'
+						    }
+						}, {
+						    tag: 'rect',
+						    id: 'iconBg',
+						    position: {
+						        top: '5px',
+						        left: '5px',
+						        width: '50px',
+						        height: '50px'
+						    },
+						    rectStyles: {
+						        color: '#66B96A',
+						        radius: '50%'
+						    }
+						}, {
+						    tag: 'font',
+						    id: 'icon',
+						    text: '\ue625', //此为字体图标Unicode码'\e600'转换为'\ue600'
+						    position: {
+						        top: '0px',
+						        left: '5px',
+						        width: '50px',
+						        height: '100%'
+						    },
+						    textStyles: {
+						        fontSrc: '_www/fonts/iconfont.ttf',
+						        align: 'center',
+						        color: '#F5F5F5',
+						        size: '30px'
+						    }
+						}]);
+					    // append 到父webview中
+						views.append(drawNativeIcon);
+
+					    //自定义监听图标点击事件
+						var active_color = '#66B96A';
+						drawNativeIcon.addEventListener('click', function (e) {
+						    console.log('activeTab:' + activeTab)
+						    //mui.alert('你点击了图标，你在此可以打开摄像头或者新窗口等自定义点击事件。', '悬浮球点击事件');
+						    if (firstTabbar != null && (activeTab == 'pages/home.html' || activeTab == 'pages/action-home.html' || activeTab == 'pages/repair-home.html')) {
+						        console.log('al')
+						        firstTabbar.evalJS("showRepair()");
+						    }
+						    // 重绘字体颜色
+						    if (active_color == '#fff') {
+						        drawNativeIcon.drawText('\ue625', {}, {
+						            fontSrc: '_www/fonts/iconfont.ttf',
+						            align: 'center',
+						            color: '#000',
+						            size: '30px'
+						        }, 'icon');
+						        active_color = '#000';
+						    } else {
+						        drawNativeIcon.drawText('\ue625', {}, {
+						            fontSrc: '_www/fonts/iconfont.ttf',
+						            align: 'center',
+						            color: '#fff',
+						            size: '30px'
+						        }, 'icon');
+						        active_color = '#fff';
+						    }
+						});
+					    // ---------------------中间凸起图标绘制及监听点击完毕------------------------------
+					});
+					//var title = document.getElementById("title");
+					//选项卡点击事件
+					mui('.mui-bar-tab').on('tap', 'a', function(e) {
+						var _self = this;
+						var targetTab = _self.getAttribute('data-id');
+						if(targetTab == activeTab) {
+							return;
+						}
+						//更换标题
+						//title.innerHTML = _self.querySelector('.mui-tab-label').innerHTML;
+						showPage(targetTab); //显示目标选项卡
+						plus.webview.hide(activeTab); //隐藏当前;
+						activeTab = targetTab; //更改当前活跃的选项卡
+					});
+					//自定义事件，模拟点击“首页选项卡”
+					document.addEventListener('gohome', function() {
+						var defaultTab = document.getElementById("home");
+						//模拟首页点击
+						mui.trigger(defaultTab, 'tap');
+						//切换选项卡高亮
+						var current = document.querySelector(".mui-bar-tab>.mui-tab-item.mui-active");
+						if(defaultTab !== current) {
+							current.classList.remove('mui-active');
+							defaultTab.classList.add('mui-active');
+						}
+					});
+					function showPage(targetTab) {
+						var currentWebview = plus.webview.getWebviewById(targetTab);
+						if(!currentWebview) {
+							currentWebview = plus.webview.create(targetTab, targetTab, app.subStyle)
+							views.append(currentWebview);
+						}
+						//若为iOS平台或非首次显示，则直接显示
+						if(mui.os.ios || aniShow[targetTab]) {
+							plus.webview.show(currentWebview);
+						} else {
+							//否则，使用fade-in动画
+							plus.webview.show(currentWebview, "fade-in", 300);
+						}
+					}
+					var first = null;
+					mui.back = function() {
+						if(!first) {
+							first = new Date().getTime();
+							/**
+							 * 自动消失提示信息
+							 * http://www.html5plus.org/doc/zh_cn/nativeui.html#plus.nativeUI.toast
+							 */
+							plus.nativeUI.toast("再按一次退出应用");
+							setTimeout(function() {
+								first = null;
+							}, 1000);
+						} else {
+							if(new Date().getTime() - first < 1000) {
+								/**
+								 * 退出应用，仅安卓有效；
+								 * http://www.html5plus.org/doc/zh_cn/runtime.html#plus.runtime.quit
+								 */
+								plus.runtime.quit();
+								//进入后台
+								//								 var main = plus.android.runtimeMainActivity();
+								//                               main.moveTaskToBack(false);
+							}
+						}
+					};
+				}
+			})
+    </script>
+</body>
+
+</html>

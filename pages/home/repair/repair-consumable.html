@@ -1,0 +1,272 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>选择维修耗材</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../../css/base.css" />
+	</head>
+
+	<body>
+		<div id="app">
+			<header class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<button type="button" class="mui-btn mui-xbtn-primary mui-pull-right" v-on:tap="doSure()" id="btnOk">确定</button>
+				<h1 class="mui-title">选择维修耗材</h1>
+			</header>
+			<div class="mui-content" style="background-color: #F5F5F5;">
+				<div v-for="(item,index) in list">
+					<div class="smp-list-info two-line">
+						<div class="smp-search-success little"><span class="rectangle" style="height: 35px;margin-top: 6px;"></span><span>出库单号：</span><span v-text="item.NO"></span></div>
+						<div class="smp-search-success little" style="line-height: 20px;"><span>领取时间：</span><span v-text="item.time"></span></div>
+					</div>
+					<div style="clear: both;"></div>
+					<div v-for="(im,idx) in item.d" class="mui-card nospace">
+						<ul class="mui-table-view">
+							<li class="mui-table-view-cell nospace">
+								<div class="mui-media-body">
+									<div class="mui-input-row mui-checkbox mui-left">
+										<label v-text="im.title"></label>
+										<input v-bind:checked="im.isCheckd" name="cbx" v-bind:value="im.id" v-bind:id="'cbx_'+im.id" class="cbx" type="checkbox" v-on:change="checkboxChange(im,$event)">
+										<div class="font-right"><span v-text="ctrlTxtShow(im.usenum)"></span><span v-text="im.surplusNum"></span>个</div>
+									</div>
+									<div style="clear: both;height: 30px;padding-left: 30px;"><span v-text="im.name" style="margin-right: 30px;"></span><span v-text="im.pu"></span></div>
+								</div>
+								<div class="mui-card-footer">
+									<div style="text-align: right;width: 100%;">
+										实际耗材数量：
+										<div class="mui-numbox" data-numbox-step='1' data-numbox-min='0' v-bind:data-numbox-max='im.num'>
+											<button class="mui-btn mui-numbox-btn-minus" type="button">—</button>
+											<input v-bind:id="'txt_'+im.id" readonly="readonly" class="mui-numbox-input" v-model.number="im.usenum" type="text" v-on:change="changeValue(im,$event)" />
+											<button class="mui-btn mui-numbox-btn-plus" v-bind:class="{disabled:im.usenum==im.num}" type="button">+</button>
+										</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../../js/common/config.js"></script>
+		<script type="text/javascript" src="../../../js/common/global.js"></script>
+		<script type="text/javascript">			
+			var app = new Vue({
+				el: "#app",
+				data: {
+					list: []
+				},
+				methods: {
+					//控制文本显示
+					ctrlTxtShow: function(usenum) {
+						return usenum == 0 ? "已领" : "剩余";
+					},
+					//点击复选框
+					checkboxChange: function(item, event) {
+						console.log('change')
+						console.log('isCheckd:' + event.target.checked)
+						item.isCheckd = event.target.checked;
+						ctrlBtnShow();
+					},
+					//监听文本框变化
+					changeValue: function(item, event) {
+						item.usenum = event.target.value;
+						item.surplusNum = event.target.value >= 0 ? item.num - event.target.value : item.surplusNum;
+						item.isCheckd = item.usenum > 0;
+						ctrlBtnShow();
+						console.log(event.target.value)
+						console.log('num:' + item.num + ",usenum:" + item.usenum);
+						console.log('surplusNum:' + item.surplusNum)
+					},
+					//判断是否可以点击确定按钮，只有当至少存在一条记录中耗材使用数和复选框同时选中时才能点击确定按钮
+					canSubmit: function() {
+						var _result = false;
+						var _list = this.list;
+						if(_list != undefined && _list != [] && _list.length > 0) {
+							for(var i = 0; i < _list.length; i++) {
+								if(_list[i].d != undefined && _list[i].d.length > 0) {
+									for(var j = 0; j < _list[i].d.length; j++) {
+										if(_list[i].d[j].usenum > 0 && _list[i].d[j].isCheckd) {
+											_result = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+						return _result;
+					},
+					//获取选中项的结果集
+					getSltList: function() {
+						var _list = this.list;
+						var _result = [],
+							_finalResult = []; //最终结果
+						if(_list != undefined && _list != [] && _list.length > 0) {
+							for(var i = 0; i < _list.length; i++) {
+								if(_list[i].d != undefined && _list[i].d.length > 0) {
+									for(var j = 0; j < _list[i].d.length; j++) {
+										if(_list[i].d[j].usenum > 0 && _list[i].d[j].isCheckd) {
+											var _item = {
+												name: _list[i].d[j].title,
+												code: _list[i].d[j].name,
+												unitprice: _list[i].d[j].price,
+												count: parseInt(_list[i].d[j].usenum),
+												eq_part_id:_list[i].d[j].eq_part_id,
+												batch_no:_list[i].d[j].ba_no,
+												export_no:_list[i].d[j].id
+											};
+											_result.push(_item);
+										}
+									}
+								}
+							}
+						}
+						console.log('_result:' + JSON.stringify(_result))
+						//过滤并合并相同耗材
+						if(_result.length > 0) {
+							//查找是否已经存在记录，已经存在则累加count
+							_finalResult = mergeArr(_result);
+						}
+						return _finalResult;
+					},
+					//确定
+					doSure: function() {
+						var jsonData = app.getSltList();
+						console.log('确认结果：' + JSON.stringify(jsonData));
+						if(jsonData != []) {
+							var view = plus.webview.getWebviewById("repair_over-order");
+							console.log(view)
+							mui.fire(view, 'doit', {
+								sltList: jsonData, //选中项的结果集，经过二次处理的
+								list: app.list //记录当前操作完后的列表状态
+							});
+						}
+						mui.back();
+					}
+				},
+				mounted: function () {
+				    mui.init();
+				    //重写返回逻辑，返回时隐藏详情页webview
+				    //mui.back = function () {
+				    //    plus.webview.currentWebview().hide("auto", 300);
+				    //}
+				    var _self = this;
+				    mui.plusReady(function () {
+				        var self = plus.webview.currentWebview();
+				        var _list = self.list;
+				        console.log('接收数据list:' + JSON.stringify(_list));
+				        console.log(_list.length)
+				        if (_list.length == 0 || _list[0] == null) {
+				            var _result = [];
+				            var d = [];
+				            console.log('GetRepairPartByUser:' + config.ORG_CODE + ',' + config.USER_ID);
+				            g.ajax(config.GetRepairPartByUser, {
+				                data: {
+				                    ORG_CODE: config.ORG_CODE,
+				                    REPLY_USER_ID: config.USER_ID
+				                },
+				                dataType: 'json',
+				                success: function (data) {
+				                    if (data.Data != undefined && data.Data != null && data.Data.length != 0) {
+				                        for (var i = 0; i < data.Data.length; i++) {
+				                            var dvi = {
+				                                NO: "",
+				                                time: "",
+				                                d: []
+				                            };
+				                            var obji = data.Data[i];
+				                            if (!obji && !obji.DETAIL) {
+				                                continue;
+				                            }
+
+				                            dvi.NO = obji.EXPORT_NO; //出库单号
+				                            dvi.time = obji.REPLY_TIME;
+
+				                            for (var j = 0; j < obji.DETAIL.length; j++) {
+				                                var obj = obji.DETAIL[j],
+                                                    dj = {};
+
+				                                dj.id = obj.EXPORT_NO; //出库单号
+				                                dj.title = obj.EQ_PART_NAME; //耗材名称
+				                                dj.name = obj.MODEL; //耗材编号
+				                                dj.num = obj.COUNT; //总的领用数
+				                                dj.price = obj.PRICE; //耗材单价
+				                                dj.unit = obj.UNIT;
+				                                dj.pu = obj.PRICE + '/' + obj.UNIT;
+				                                dj.usenum = 0; //实际耗材数量
+				                                dj.isCheckd = false; //复选框是否选中
+				                                dj.eq_part_id = obj.EQ_PART_ID;
+				                                dj.surplusNum = dj.num - dj.usenum; //剩余数
+				                                dj.ba_no = obj.BATCH_NO;
+				                                dvi.d.push(dj);
+				                            }
+				                            _result.push(dvi);
+				                        }
+
+				                    } else {
+				                        mui.toast('无记录');
+				                        //mui.back();
+				                    }
+				                    console.log(_result)
+				                    _self.list = _result;
+				                    //console.log(JSON.stringify(_result))
+				                    //解决动态加载numbox无效的bug
+				                    setTimeout(function () {
+				                        mui('.mui-numbox').numbox();
+				                    }, 300);
+				                }
+				            });
+				        }
+				        else {
+				            _self.list = _list;
+				            //解决动态加载numbox无效的bug
+				            setTimeout(function () {
+				                mui('.mui-numbox').numbox();
+				            }, 300);
+				        }
+				    });
+				}
+			});
+			//合并过滤数据
+			function mergeArr(data) {
+				var map = {};
+				var arr = [];
+				for(var i = 0; i < data.length; i++) {
+					var di = data[i];
+					var n = di.code;
+					if(!map[n]) {
+						map[n] = di.count;
+						arr.push(di);
+					} else {
+						for(var j = 0; j < arr.length; j++) {
+							var aj = arr[j];
+							if(aj.code == n) {
+								aj.count += di.count;
+								break;
+							}
+						}
+					}
+				}
+				return arr;
+			}
+			/**
+			 * 控制确定按钮的启用和禁用
+			 * @param {Object} name
+			 */
+			function ctrlBtnShow(name) {
+				var _canSubmit = app.canSubmit();
+				console.log('canSubmit:' + _canSubmit)
+				if(_canSubmit) {
+					document.getElementById("btnOk").disabled = false;
+				} else {
+					document.getElementById("btnOk").disabled = true;
+				}
+			}
+		</script>
+	</body>
+
+</html>

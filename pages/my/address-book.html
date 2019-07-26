@@ -1,0 +1,71 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>通讯录</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+	</head>
+
+	<body>
+		<div id="app" class="mui-content bg-white">
+            <div v-for="item in list">
+                <div class="address-head" v-text="item.DEP_NAME"></div>
+                <ul class="mui-table-view nospace">
+                    <li v-for="subItem in item.LSTUSER" class="mui-table-view-cell mui-media">
+                        <a href="javascript:;">
+                            <span class="mui-icon iconfont icon-dianhua fl" v-on:tap="call(subItem)"></span>
+                            <div class="mui-media-body msg">
+                                <span v-text="subItem.NAME"></span>
+                                <p class="mui-ellipsis"><span v-text="subItem.PHONE"></span></p>
+                            </div>
+                        </a>                                          
+                    </li>
+                </ul>
+            </div>
+         </div>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+		<script type="text/javascript">
+			var btnArray = ['取消', '呼叫'];
+			var app = new Vue({
+				el: "#app",
+				data: {
+					list: []
+				},
+				mounted: function() {
+				    var _self = this;
+				    mui.init();
+				    g.ajax(config.QueryAddrList, {
+				        data: {
+				            orgCode: config.ORG_CODE
+				        },
+				        success: function (data) {
+				            console.log('data:'+JSON.stringify(data))
+				            _self.list = data.Data;
+				        }
+				    });
+				},
+				methods: {
+					call:function(item){
+						var _info=item.NAME+"     "+item.PHONE;
+						mui.confirm(_info, '呼叫确认', btnArray, function(e) {
+							if(e.index == 1) {
+                               plus.device.dial(item.PHONE, false); 
+							}
+						});
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

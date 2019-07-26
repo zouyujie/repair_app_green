@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>奖励金额</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+	</head>
+
+	<body style="background-color: white;">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">本月奖励</h1>
+		</header>
+		<div id="app" class="mui-content">
+			<div class="div-totalMoney">
+				<p class="t1"><span v-text="data_d.Amount_Month"></span></p>
+				<p class="t3">￥金额</p>
+			</div>
+			<div class="mui-slider div-curMoney">
+				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<a class="mui-control-item mui-active" v-on:tap="changeTab(1)" href="#item1mobile">
+						<p class="one">￥ <span v-text="data_d.Amount_ToDay"></span> </p>
+						<p class="two">今日奖励明细</p>
+					</a>
+					<a class="mui-control-item" v-on:tap="changeTab(2)" href="#item2mobile">
+						<p class="one">￥<span v-text="data_d.yearRewards"></span> </p>
+						<p class="two">今年累计金额</p>
+					</a>
+				</div>
+			</div>
+			<div class="line2"></div>
+			<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+				<div class="mui-scroll-wrapper" style="background-color:#F5F5F5;">
+					<div class="mui-scroll">
+						<ul class="mui-table-view ul-moneyDetail-list" v-bind:class="{'no-bottom':data_d.Amount_ToDay<=0}">
+                            <li v-if="data_d.Amount_ToDay<=0">
+                                <div class="empty-container style1" v-cloak>
+                                    <div class="nodata-info style1">今日暂无工单奖励，加油努力哦！</div>
+                                    <div class="nodata-icon"><span class="mui-icon iconfont icon-jinqian1"></span></div>
+                                </div>
+                            </li>
+							<li v-else v-for="item in data_d.Detail_List" class="mui-table-view-cell mui-media" v-cloak>
+								<a href="javascript:;">
+									<div class="mui-media-body">
+										<span class="title" v-text="item.RewardBillType"></span>
+										<span class="money fr">￥<span v-text="item.Amount"></span></span>
+										<p class="mui-ellipsis xl">单号：<span v-text="item.BillNo"></span><!--<span class="fr" v-text="formatDate(item.FinishTime)"></span>--></p>
+									</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="item2mobile" class="mui-slider-item mui-control-content">
+                <div v-if="data_d.yearRewards==0" class="empty-container style1" v-cloak>
+                    <div class="nodata-info style1">暂无相关内容</div>
+                    <div class="nodata-icon"><span class="mui-icon iconfont icon-shuju"></span></div>
+                </div>
+				<div v-else>
+                    <div class="smp-list-info">
+                        <div class="smp-search-success"><span class="rectangle"></span><span>今年逐月累计金额奖励趋势</span></div>
+                    </div>
+                    <div class="chartContainer" v-cloak>
+                        <div class="chart" id="yearPrizeChart"></div>
+                    </div>
+                </div>
+			</div>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+		<script type="text/javascript" src="../../js/libs/echarts.min.js"></script>
+		<script type="text/javascript">
+			var yearPrizeChart = null;
+			var app = new Vue({
+				el: "#app",
+				data: {
+				    data_d: {}
+				},
+				mounted: function() {
+				    var _self = this;
+				    mui.init()
+				    mui.ready(function () {
+				        var _h = g.getScreenInfo('height') - 252 + 'px';
+				        console.log(_h)
+				        g.initScroll({
+				            h: _h
+				        });
+				    });
+				    //_self.data_d = { "Amount_ToDay": "5", "Amount_Month": "5", "Amount_One": "0", "Amount_Two": "0.00", "Amount_Three": "0.00", "Amount_Four": "0.00", "Amount_Five": "0.00", "Amount_Six": "0.00", "Amount_Seven": "0.00", "Amount_Eight": "0.00", "Amount_Nine": "0.00", "Amount_Ten": "0.00", "Amount_Eleven": "0.00", "Amount_Twelve": "5.00", "Detail_List": [{ "RewardBillType": " 巡检工单", "EQT_FAULT_AMI": "E0C10", "BillNo": "X4301J01171225003", "Amount": "1.00", "SignTime": "2017-12-25T13:54:52", "FinishTime": "2017-12-25T13:55:38" }, { "RewardBillType": " 巡检工单", "EQT_FAULT_AMI": "E0C10", "BillNo": "X4301J01171225009", "Amount": "1.00", "SignTime": "2017-12-25T13:53:34", "FinishTime": "2017-12-25T13:54:26" }, { "RewardBillType": " 巡检工单", "EQT_FAULT_AMI": "E0C10", "BillNo": "X4301J01171225002", "Amount": "1.00", "SignTime": "2017-12-25T13:50:46", "FinishTime": "2017-12-25T13:53:01" }, { "RewardBillType": " 巡检工单", "EQT_FAULT_AMI": "E0C10", "BillNo": "X4301J01171225012", "Amount": "1.00", "SignTime": "2017-12-25T13:51:02", "FinishTime": "2017-12-25T13:51:55" }, { "RewardBillType": " 巡检工单", "EQT_FAULT_AMI": "E0C10", "BillNo": "X4301J01171225007", "Amount": "1.00", "SignTime": "2017-12-25T10:19:14", "FinishTime": "2017-12-25T10:48:39" }] };
+					mui.plusReady(function () {
+					    var this_self = plus.webview.currentWebview();
+					    //console.log('_self.data_d:' + _self.data_d);
+						_self.data_d = this_self.Rewards;
+					    console.log('data_d:'+JSON.stringify(_self.data_d))
+						_self.data_d.yearRewards=parseInt(_self.data_d.Amount_One)+parseInt(_self.data_d.Amount_Two)+parseInt(_self.data_d.Amount_Three)+parseInt(_self.data_d.Amount_Four)+parseInt(_self.data_d.Amount_Five)+parseInt(app.data_d.Amount_Six)+parseInt(_self.data_d.Amount_Seven)+parseInt(_self.data_d.Amount_Eight)+parseInt(_self.data_d.Amount_Nine)+parseInt(_self.data_d.Amount_Ten)+parseInt(_self.data_d.Amount_Eleven)+parseInt(_self.data_d.Amount_Twelve);						 						 
+					})
+				},
+				methods: {
+					formatDate: function(t) {
+						return g.formatDate(t, 'YMDHMS');
+					},
+					//切换tab
+					changeTab: function(tag) {
+						setTimeout(function() {
+							if(tag == 2) { //今年累计金额
+								var charts = g.id('yearPrizeChart');
+								var _chart = yearPrizeChart || echarts.init(charts);
+								var data_d = [parseInt(app.data_d.Amount_One), parseInt(app.data_d.Amount_Two), parseInt(app.data_d.Amount_Three), parseInt(app.data_d.Amount_Four), parseInt(app.data_d.Amount_Five),
+                                    parseInt(app.data_d.Amount_Six),parseInt(app.data_d.Amount_Seven),parseInt(app.data_d.Amount_Eight),parseInt(app.data_d.Amount_Nine),parseInt(app.data_d.Amount_Ten),parseInt(app.data_d.Amount_Eleven),parseInt(app.data_d.Amount_Twelve)];
+								app.initChart(_chart, data_d)
+							}
+						}, 300);
+					},
+					//初始化报表
+					initChart: function(chart, data_d) {
+						var chartOption = {
+							color: ['#6BA7F0'],
+							tooltip: {
+							    trigger: 'axis',
+							    formatter: '{b}月:￥{c}',
+								axisPointer: { // 坐标轴指示器，坐标轴触发有效
+									type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+								}
+							},
+							grid: {
+								left: '3%',
+								right: '4%',
+								bottom: '3%',
+								containLabel: true
+							},
+							xAxis: [{
+								name:'(月)',
+								type: 'category',
+								data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+								axisTick: {
+									alignWithLabel: true
+								},
+								axisLine: { lineStyle:{color:'#666666'}}
+							}],
+							yAxis: [{
+								name:'(元)',
+								type: 'value',
+								axisLine: { lineStyle: { color: '#666666' } }
+							}],
+							series: [{
+								name: '本月金额',
+								type: 'bar',
+								barWidth: '60%',
+								data: data_d
+							}],
+							label: {
+							    normal: {
+							        show: true,
+							        formatter: '￥{c}',
+							        position: 'top'
+							    }
+							}
+						};
+						console.log('chartOption:' + JSON.stringify(chartOption))
+						g.initEChartsMin(chart, chartOption);
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,323 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>数据中心</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+        <style type="text/css">
+            .divFooter{height: 40px;line-height: 40px;text-align: center;background-color: #FFFFFF;padding: 3px 20px;margin-top:10px;}
+            .divFooter input[type='text']{width: 35%;float: left; height: 34px;padding: 5px 10px;font-size: 14px;}
+            .divFooter a{float: right;margin-top: 2px;width: 50px;margin-right: 0px;}
+            .divFooter span{float: left;width: 30px;}
+            .mui-segmented-control .mui-control-item.mui-active.no-active{border-color: #66B96A;color:#1F9B53;background-color:#ffffff;}
+            .chart{height: 375px; }
+            .divFooter a{padding-top: 8px;}
+            .chartContainer{height:380px !important;}  
+            html, body {background-color: white;}
+        </style>
+	</head>
+
+	<body>
+		<div id='app'>
+			<!--<header class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">数据中心</h1>
+			</header>-->
+			<div class="mui-content data-center">
+			    <div class="line2"></div>
+				<div class="tab-head">
+					<div id="segmentedControl" class="mui-segmented-control">
+                        <a class="mui-control-item mui-active" v-bind:class={'no-active':isRange} v-on:tap="changeTab(3)" href="#item4">今日</a>
+						<a class="mui-control-item" v-bind:class={'no-active':isRange} v-on:tap="changeTab(0)" href="#item1">本月</a>
+						<a class="mui-control-item" v-bind:class={'no-active':isRange} v-on:tap="changeTab(1)" href="#item2">本季度</a>
+						<a class="mui-control-item" v-bind:class={'no-active':isRange} v-on:tap="changeTab(2)" href="#item3">本年度</a>
+					</div>
+				</div>
+                <div class="divFooter">
+                    <input v-model="txtStartDate" v-on:tap="startDateTap($event)" data-options='{"type":"date"}' type="text"  readonly="readonly"/><span>至</span>
+                    <input v-model="txtEndDate"  v-on:tap="endDateTap($event)" data-options='{"type":"date"}' type="text" readonly="readonly" />
+                    <a v-on:tap="changeTab(4)" class="mui-btn mui-xbtn-primary">确认</a>
+                </div>
+                <div class="mui-control-content" v-show="isRange" style="display: block;">
+                    <div class="smp-list-info">
+                        <div class="smp-search-success"><span class="rectangle"></span><span v-text="txtStartDate"></span><span>—</span><span v-text="txtEndDate"></span> 已完工工单</div>
+                    </div>
+                    <div class="chartContainer">
+                        <div class="chart" id="rangeWorkloadChart"></div>
+                    </div>
+                </div>
+				<div v-show="!isRange">
+                    <div id="item4" class="mui-control-content mui-active">
+                        <div class="smp-list-info">
+                            <div class="smp-search-success"><span class="rectangle"></span><span>今日已完工工单</span></div>
+                        </div>
+                        <div class="chartContainer">
+                            <div class="chart" id="todayWorkloadChart"></div>
+                        </div>
+                    </div>
+					<div id="item1" class="mui-control-content">
+						<div class="smp-list-info">
+							<div class="smp-search-success"><span class="rectangle"></span><span>本月已完工工单</span></div>
+						</div>
+						<div class="chartContainer">
+							<div class="chart" id="monthWorkloadChart"></div>
+						</div>
+					</div>
+					<div id="item2" class="mui-control-content">
+						<div class="smp-list-info">
+							<div class="smp-search-success"><span class="rectangle"></span><span>本季度已完工工单</span></div>
+						</div>
+						<div class="chartContainer">
+							<div class="chart" id="quarterWorkloadChart"></div>
+						</div>
+					</div>
+					<div id="item3" class="mui-control-content">
+						<div class="smp-list-info">
+							<div class="smp-search-success"><span class="rectangle"></span><span>本年度已完工工单</span></div>
+						</div>
+						<div class="chartContainer">
+							<div class="chart" id="yearWorkloadChart"></div>
+						</div>
+					</div>
+					<!--<div class="line2"></div>
+					<div class="smp-list-info">
+						<div class="smp-search-success"><span class="rectangle"></span><span>满意度</span></div>
+					</div>
+					<div class="chartContainer">
+						<div class="chart" id="satisfactionChart"></div>
+					</div>-->
+				</div>
+			</div>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+        <script type="text/javascript" src="../../js/libs/mui.picker.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+		<script type="text/javascript" src="../../js/libs/echarts.min.js"></script>
+		<script type="text/javascript">
+            var monthWorkloadChart = null, quarterWorkloadChart = null, yearWorkloadChart = null, todayWorkloadChart = null;
+            var rangeWorkloadChart = null;
+			//var satisfactionChart = null;
+			var color = ['#FFBD4D', '#5CBD9C', '#6BA7F0'];
+			mui.init()
+			var app = new Vue({
+				el: "#app",
+				data: {
+				    list: [],
+				    txtStartDate: '',
+				    txtEndDate: '',
+				    isRange:false
+				},
+				mounted: function () {
+					var _self = this;
+					var charts = g.id('todayWorkloadChart');
+					var _chart = echarts.init(charts);
+					todayWorkloadChart = _chart;
+				    //console.log(_chart)
+					_chart.showLoading();
+					g.ajax(config.QueryWorkLoadQty, {
+						data: {
+							orgCode: config.ORG_CODE,
+							userId: config.USER_ID,
+							timeType: 3
+						},
+						dataType: 'json',
+						success: function (data) {
+                            console.log('data:'+JSON.stringify(data))
+							_chart.hideLoading();
+							_self.initChart(_chart, data.Data);
+						},
+						error: function() {
+							_chart.hideLoading();
+						}
+					});
+				},
+				methods: {
+					//切换选项卡
+				    changeTab: function (tag) {
+				        if (tag == 4) {
+				            app.isRange = true;
+				        } else {
+				            app.txtStartDate = '';
+				            app.txtEndDate = '';
+				            app.isRange = false;
+				        }
+				        setTimeout(function () {
+				            console.log(tag);
+				            var _where = {
+				                orgCode: config.ORG_CODE,
+				                userId: config.USER_ID,
+				                timeType: tag
+				            };
+				            var _chart = null;
+				            switch (tag) {
+				                case 0:
+				                    _id = 'monthWorkloadChart';
+				                    var charts = g.id(_id);
+				                    _chart = monthWorkloadChart || echarts.init(charts);
+				                    break;
+				                case 1:
+				                    _id = 'quarterWorkloadChart';
+				                    var charts = g.id(_id);
+				                    _chart = quarterWorkloadChart || echarts.init(charts);
+				                    break;
+				                case 2:
+				                    _id = 'yearWorkloadChart';
+				                    var charts = g.id(_id);
+				                    _chart = yearWorkloadChart || echarts.init(charts);
+				                    break;
+				                case 4:
+				                    _id = 'rangeWorkloadChart';
+				                     var charts = g.id(_id);
+				                    _chart = echarts.init(charts);
+				                    _where.strStartDate = app.txtStartDate;
+				                    _where.strEndData = app.txtEndDate;
+				                    break;
+				                default:
+				                    _id = 'todayWorkloadChart';
+				                     var charts = g.id(_id);
+				                    _chart = todayWorkloadChart || echarts.init(charts);
+				                    break;
+				            }
+				            //console.log(charts.innerHTML)
+				            console.log('tag:' + tag+",app.isRange："+app.isRange);
+				            _chart.showLoading();
+				            g.ajax(config.QueryWorkLoadQty, {
+				                data: _where,
+				                dataType: 'json',
+				                success: function (data) {
+				                    console.log('data_d:' + JSON.stringify(data.Data));
+				                    _chart.hideLoading();
+				                    app.initChart(_chart, data.Data)
+				                },
+				                error: function () {
+				                    _chart.hideLoading();
+				                }
+				            });
+				        }, 300);
+					},
+					//初始化报表
+					initChart: function(chart, data_d) {
+						var data = []; //getOption(data);
+						var chartOption = {
+						    color: ['#54C599', '#FBA288'],
+							tooltip: {
+								trigger: "axis",
+								triggerOn: "mousemove",
+								axisPointer: {
+									type: "shadow",
+									orient: "horizontal"
+								},
+								orient: "horizontal"
+							},
+							legend: {
+								//y: 'bottom',
+							    data: ['已完工工单','未完成工单']
+							},
+							grid: {
+								left: '3%',
+								right: '4%',
+								bottom: '0px',
+								containLabel: true
+							},
+							xAxis: [{
+								type: 'category',
+								data: ['维修', '模块2','模块3'],
+								axisTick: {
+									alignWithLabel: true
+								}
+							}],
+							yAxis: [{
+								type: 'value'
+							}],
+							series: [{
+							    name: '已完工工单',
+								stack: "repair",
+								type: 'bar',
+								barWidth: '40',
+								data: [data_d[0].FinishQty, data_d[1].FinishQty, data_d[2].FinishQty],
+								label: {
+								    normal: {
+								        show: true,
+								        position: 'inside'
+								    }
+								}
+								//markPoint: {
+								//    data: [{
+								//        coord: ['维修', data_d[0].FinishQty]
+								//    },  {
+								//        coord: ['模块2', data_d[1].FinishQty]
+								//    },{
+								//        coord: ['模块3', data_d[2].FinishQty]
+								//    }]
+								//},
+							},
+							{
+							    name: '未完成工单',
+							    stack: "repair",
+							    type: 'bar',
+							    barWidth: '40',
+							    data: [data_d[0].NoFinishQty, data_d[1].NoFinishQty, data_d[2].NoFinishQty],
+							    label: {
+							        normal: {
+							            show: true,
+							            position: 'top'
+							        }
+							    }
+							    //markPoint: {
+							    //    data: [{
+							    //        coord: ['维修', data_d[0].NoFinishQty]
+							    //    }, {
+							    //        coord: ['模块2', data_d[1].NoFinishQty]
+							    //    }, {
+							    //        coord: ['模块3', data_d[2].NoFinishQty]
+							    //    }]
+							    //},
+							}]
+						};
+					    console.log('chartOption:'+JSON.stringify(chartOption))
+						g.initEChartsMin(chart, chartOption);
+					},
+				    //开始日期
+					startDateTap: function (event) {
+					    var optionsJson = event.target.getAttribute('data-options') || '{}';
+					    var options = JSON.parse(optionsJson);
+					    var dtPicker = new mui.DtPicker(options);
+					    dtPicker.show(function (rs) {
+					        //console.log(rs.text+" 00:00");
+					        app.txtStartDate = rs.text;//+" 00:00";
+					    })
+					},
+				    //结束日期
+					endDateTap: function (event) {
+					    var optionsJson = event.target.getAttribute('data-options') || '{}';
+					    var options = JSON.parse(optionsJson);
+					    options.beginDate = g.convertDateFromString(app.txtStartDate);
+					    var dtPicker = new mui.DtPicker(options);
+					    dtPicker.show(function (rs) {
+					        //console.log(rs.text);
+					        app.txtEndDate = rs.text;// + " 11:59";
+					    })
+					},
+				    //日期范围查询确定
+					sureDate: function () {
+					    var txtB = app.txtStartDate;
+					    var txtE = app.txtEndDate;
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

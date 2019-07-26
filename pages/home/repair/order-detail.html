@@ -1,0 +1,577 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>工单详情</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../../css/base.css" rel="stylesheet" />
+		<link href="../../../css/app/home/work-detail.css" rel="stylesheet" />
+		<link href="../../../css/mui.picker.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title rackRecord">工单详情</h1>
+			<a id="rackRecord" class="track-record">跟踪记录<i class="mui-icon mui-icon-arrowright"></i></a>
+		</header>
+		<nav id='nav' v-show="showTool" class="mui-bar mui-bar-tab" v-cloak>
+			<!--医护人员-->
+			<div v-if="showCtr.iscustomer" id="divWaitDispatching" v-cloak>
+				<button v-show="showCtr.iscancleOrder" type="button" v-on:tap="cancleOrder('')" class="mui-btn mui-btn-lightBlue mui-btn-outlined" v-bind:class="{b1:showCtr.canReminderOrder,b4:!showCtr.canReminderOrder}">撤单</button>
+				<button v-show="showCtr.canReminderOrder" type="button" v-on:tap="reminderOrder('')" class="mui-btn mui-btn-lightBlue mui-btn-block" v-bind:class="{b3:showCtr.iscancleOrder,b4:!showCtr.iscancleOrder}" v-text="ctrlReminderOrderTxt()">催单</button>
+				<!--<div v-show="showCtr.canAudit" v-cloak><button type="button" class="btnSubmit mui-btn next-btn mui-btn-primary" v-on:tap="audit('detail')">评价</button></div>-->
+			</div>
+			<div v-else v-cloak>
+                <!--待派工-->
+                <div v-show="showCtr.iswaitOrder" v-cloak>
+                    <button v-show="showCtr.iscancleOrder" type="button" v-on:tap="cancleOrder('')" class="mui-btn mui-btn-lightBlue mui-btn-outlined"
+                            v-bind:class="{'b1':showCtr.isqdan||showCtr.ispg,'b3':!showCtr.isqdan&&!showCtr.ispg&&!showCtr.iscreate,'b4':!showCtr.isqdan&&!showCtr.ispg&&showCtr.iscreate}">
+                        撤单
+                    </button>
+                    <button v-show="showCtr.ispg" type="button" class="btnSubmit mui-btn mui-btn-lightBlue mui-btn-block" v-bind:class="{'mui-btn-block':!showCtr.isqdan,'mui-btn-outlined':showCtr.isqdan,'b1':showCtr.isqdan&&showCtr.iscancleOrder||(!showCtr.iscancleOrder&&showCtr.isqdan), 'b3':showCtr.iscancleOrder&&!showCtr.isqdan,'b4':!showCtr.iscancleOrder&&!showCtr.isqdan}" v-on:tap="dispatching()">派工</button>
+                    <button v-show="showCtr.isqdan" type="button" class="btnSubmit mui-btn mui-btn-lightBlue mui-btn-block" v-bind:class="{'b2':showCtr.ispg&&showCtr.iscancleOrder,'b3':showCtr.iscancleOrder&&!showCtr.ispg||(!showCtr.iscancleOrder&&showCtr.ispg),'b4':!showCtr.iscancleOrder&&!showCtr.ispg}" v-on:tap="getOrder()">立即抢单</button>   
+                </div>
+                <!--待签到-->
+                <div v-show="showCtr.iswaitSignin" v-cloak>
+                    <button v-show="showCtr.iscancleOrder" type="button" v-on:tap="cancleOrder('')" class="mui-btn mui-btn-lightBlue mui-btn-outlined"
+                            v-bind:class="{'b1':showCtr.canSignin||showCtr.iszd,'b3':!showCtr.canSignin&&!showCtr.iszd,'b4':!showCtr.iszd&&!showCtr.canSignin&&showCtr.iscreate}">
+                        撤单
+                    </button>
+                    <button v-show="showCtr.isbackOrder" type="button" v-on:tap="backOrder()" class="mui-btn mui-btn-lightBlue mui-btn-outlined" v-bind:class="{'b1':showCtr.canSignin}">退单</button>
+                    <button v-show="showCtr.iszd" type="button" v-if="showCtr.iszd" class="mui-btn mui-btn-lightBlue mui-btn-outlined" 
+                            v-bind:class="{'b4':!showCtr.canSignin&&!showCtr.iscancleOrder,'b3':!showCtr.canSignin&&showCtr.iscancleOrder,'b1':showCtr.canSignin&&showCtr.iscancleOrder}" v-on:tap="dispatching('Z')">
+                        转单
+                    </button>
+                    <button v-show="showCtr.canSignin" type="button" class="btnSubmit mui-btn next-btn mui-btn-primary" 
+                            v-bind:class="{'b2':showCtr.iscancleOrder,'b3':!showCtr.iscancleOrder}" v-on:tap="signin('home',vm.data_r.MONEY,vm.data_r.HOURS)">签到</button>
+                </div>
+                <!--待完工-->
+                <div v-show="showCtr.iswaitOver" v-cloak>
+                    <a v-bind:disabled="NoRepertoryIng" class="mui-btn" v-on:tap="noRepertoryWarn()" v-text="NoRepertoryTxt" v-bind:class="{'b1':showCtr.canOverOrder||showCtr.iszd,'b4':!showCtr.canOverOrder&&!showCtr.iszd}">无库存提醒</a>
+                    <button v-show="showCtr.iszd" type="button" v-if="showCtr.iszd" class="mui-btn mui-btn-lightBlue mui-btn-outlined"
+                            v-bind:class="{'b3':!showCtr.canOverOrder,'b2':showCtr.canOverOrder}" v-on:tap="dispatching('Z')">
+                        转单
+                    </button>
+                    <button v-show="showCtr.canOverOrder" v-bind:disabled="OverOrderIng" type="button" v-on:tap="writeOrder('detail')" class="mui-btn mui-btn-lightBlue mui-btn-block" v-bind:class="{'b3':!showCtr.iszd,'b2':showCtr.iszd}">填写完工单</button>
+                </div>            
+			</div>
+		</nav>
+		<div id="mui-content" class="mui-content">
+			<div class="smp-content-padded">
+				<ul class="mui-table-view no-underline">
+					<li class="mui-table-view-cell mui-media">
+						<div>
+							<div class="mui-media-body">
+								<div class="div-orderinfo">
+									<span class="orderno" v-cloak>工单号:{{where.NO}}</span><span class="mui-badge floatLeft" v-bind:class="bcolor" v-text="statusName"></span>
+								</div>
+								<button type="button" v-show="data_r.MONEY!=0" class="mui-btn mui-btn-warning mui-btn-outlined"><span class="mui-icon iconfont icon-jichutubiao_jiangli"></span>奖励 ¥ <span v-text="data_r.MONEY"> </span></button>
+								<button type="button" v-show="data_r.HOURS!=0" class="mui-btn mui-btn-warning mui-btn-outlined">{{data_r.HOURS}}H完成</button>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="mui-input-group no-toline">
+					<div class="smp-list-info">
+						<div class="smp-search-success"><span class="rectangle"></span><span>报修信息</span></div>
+					</div>
+					<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">故障类型</div>
+							<div class="wrap" v-text="data_r.FAULT_NAME"></div>
+						</div>
+					</div>
+					<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">故障描述</div>
+							<div class="wrap" v-text="data_r.FAULT_INFO"></div>
+						</div>
+					</div>
+					<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">故障照片</div>
+							<div class="wrap">
+								<!--<span><img id="test1" data-preview-src="" data-preview-group="1"/></span>-->
+								<span v-for="(img,index) in files"><img  data-preview-src="" data-preview-group="1" v-if="img.SUB_TYPE==WorkOrderStatus.waitOrder.value" v-bind:src="getImg(img,data_r.SOURCE)" /></span>
+							</div>
+						</div>
+					</div>
+					<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">建筑名称</div>
+							<div class="wrap" v-text="data_r.BUILD_NAME" style="color:dodgerblue;" v-on:tap="buildDetail()"></div>
+						</div>
+					</div>
+                    <div class="mui-input-row multi-line">
+                        <div class="box label-right">
+                            <div class="div-leftauto">维修地址</div>
+                            <div class="wrap" v-text="data_r.ADDRESS"></div>
+                        </div>
+                    </div>
+					<div class="mui-input-row">
+						<label>限定时间</label>
+						<label class="label-right" v-text="g.formatDate(data_r.LIMIT_TIME,'YMDHMS')"></label>
+					</div>
+					<!--<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">维修地点</div>
+							<div class="wrap" v-text="data_r.ADDRESS"></div>
+						</div>
+					</div>-->
+                    <div class="mui-input-row multi-line no-bottom">
+                        <div class="box label-right">
+                            <div class="div-leftauto">备注信息</div>
+                            <div class="wrap" v-text="g.emptyDefaultTxt(data_r.MEMO)"></div>
+                        </div>
+                    </div>
+					<div class="line"></div>
+					<div style="clear: both;"></div>
+					<div v-if="nav.statusid==WorkOrderStatus.Over.value||nav.statusid==WorkOrderStatus.waitAudit.value">
+						<div class="smp-list-info">
+							<div class="smp-search-success"><span class="rectangle"></span><span>维修信息</span></div>
+						</div>
+						<div class="mui-input-row">
+							<label>维修人员</label>
+							<label class="label-right" v-text="data_r.REPAIR_USER_NAME"></label>
+						</div>
+						<div class="mui-input-row">
+							<label>完成时间</label>
+							<label class="label-right" v-text="g.formatDate(data_r.FINISH_TIME,'YMDHMS')"></label>
+						</div>
+						<div class="mui-input-row multi-line">
+							<div class="box label-right">
+								<div class="div-leftauto">故障类型</div>
+								<div class="wrap" v-text="data_r.FAULT_NAME"></div>
+							</div>
+						</div>
+						<div class="mui-input-row multi-line">
+							<div class="box label-right">
+								<div class="div-leftauto">处理结果</div>
+								<div class="wrap" v-text="data_r.FINISH_INFO"></div>
+							</div>
+						</div>
+						<div class="mui-input-row multi-line no-bottom">
+							<div class="box label-right">
+								<div class="div-leftauto">处理照片</div>
+								<div class="wrap">
+									<span v-for="(img,index) in files"><img data-preview-src="" data-preview-group="2" v-if="img.SUB_TYPE==WorkOrderStatus.waitOver.value" v-bind:src="g.getImg(img)" /></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--<div v-if="nav.statusid==WorkOrderStatus.Over.value">
+						<div class="smp-list-info">
+							<div class="smp-search-success"><span class="rectangle"></span><span>处理评价</span></div>
+						</div>
+						<div class="mui-input-row">
+							<label>维修评价</label>
+							<div class="icons mui-inline small" v-cloak>
+								{{Judge.msg}}
+								<i v-show='Judge.SCORE>0' class="mui-icon mui-icon-star-filled"></i>
+								<i v-show='Judge.SCORE>1' class="mui-icon mui-icon-star-filled"></i>
+								<i v-show='Judge.SCORE>2' class="mui-icon mui-icon-star-filled"></i>
+								<i v-show='Judge.SCORE>3' class="mui-icon mui-icon-star-filled"></i>
+								<i v-show='Judge.SCORE>4' class="mui-icon mui-icon-star-filled"></i>
+							</div>
+						</div>
+						<div class="mui-input-row multi-line no-bottom">
+							<div class="box label-right">
+								<div class="div-leftauto">评价意见</div>
+								<div class="wrap" v-text="Judge.MESSAGE"></div>
+							</div>
+						</div>
+					</div>-->
+					<div v-if="nav.statusid!=WorkOrderStatus.waitOrder.value">
+						<div v-if="nav.statusid!=WorkOrderStatus.waitSignin.value">
+							<div class="smp-list-info">
+								<div class="smp-search-success"><span class="rectangle"></span><span>维修人信息</span></div>
+							</div>
+							<div class="mui-input-row multi-line">
+								<div class="box label-right">
+									<div class="div-leftauto">所属班组</div>
+									<div class="wrap" v-text="data_r.REPAIR_DEPT_NAME"></div>
+								</div>
+							</div>
+							<div class="mui-input-row" v-bind:class="{'no-bottom':nav.statusid==WorkOrderStatus.waitSignin.value}">
+								<label>执行人员</label>
+								<label class="label-right" v-text="data_r.REPAIR_USER_NAME"></label>
+							</div>
+						</div>
+						<div v-if="nav.statusid!=WorkOrderStatus.waitSignin.value">
+							<div class="mui-input-row no-bottom">
+								<label>签到时间</label>
+								<label class="label-right" v-text="g.formatDate(data_r.SIGN_TIME,'YMDHMS')"></label>
+							</div>
+							<!--<div class="mui-input-row multi-line no-bottom">
+								<div class="box label-right">
+									<div class="div-leftauto">签到照片</div>
+									<div class="wrap">
+										<span v-for="(img,index) in files"><img data-preview-src="" data-preview-group="3" v-if="img.SUB_TYPE==WorkOrderStatus.waitSignin.value" v-bind:src="g.getImg(img)" /></span>
+									</div>
+								</div>
+							</div>-->
+						</div>
+					</div>
+					<div class="smp-list-info">
+						<div class="smp-search-success"><span class="rectangle"></span><span>报修人信息</span></div>
+					</div>
+					<div class="mui-input-row">
+						<label>报修来源</label>
+						<label class="label-right" v-text="getRepairSourceName(data_r.SOURCE)"></label>
+					</div>
+					<div class="mui-input-row">
+						<label>报修人</label>
+						<label class="label-right" v-text="g.emptyDefaultTxt(data_r.REPORT_USER_NAME)"></label>
+					</div>
+					<div class="mui-input-row multi-line">
+						<div class="box label-right">
+							<div class="div-leftauto">报修部门</div>
+							<div class="wrap" v-text="g.emptyDefaultTxt(data_r.DEPT_CODE_NAME)"></div>
+						</div>
+					</div>
+					<div class="mui-input-row">
+						<label>报修电话</label>
+						<label class="label-right" v-text="g.emptyDefaultTxt(data_r.PHONE)"></label>
+					</div>
+					<div class="mui-input-row">
+						<label>报修单号</label>
+						<label class="label-right" v-text="data_r.NO"></label>
+					</div>
+				</div>
+			</div>
+            <div id="popoverDetail" class="mui-popover">
+                <div class="mui-content">
+                    <div class="smp-content-padded" style="margin-top:15px;" id="scrollDiv">
+                        <div class="mui-input-group no-toline">
+                            <div class="mui-input-row multi-line">
+                                <div class="box label-right">
+                                    <div class="div-leftauto">建筑名称</div>
+                                    <div class="wrap" v-text="data_r.BUILD_NAME"></div>
+                                </div>
+                            </div>
+                            <div class="mui-input-row">
+                                <label>建筑编号</label>
+                                <label class="label-right" v-text="data_r.BUILD_ID"></label>
+                            </div>
+                                    <div class="mui-input-row">
+                                        <label>联系人</label>
+                                        <label class="label-right" v-text="buildInfo.CONTACT"></label>
+                                        <span class="edit-build" v-on:tap="editUser(buildInfo)" v-text="AddOrEditTxt">编辑</span>
+                                    </div>
+                                    <div class="mui-input-row">
+                                        <label>联系电话</label>
+                                        <label class="label-right" style="color:dodgerblue;" v-text="buildInfo.TEL" v-on:tap="call(buildInfo)"></label>
+                                    </div>
+                                    <div class="mui-input-row">
+                                        <label>建筑面积</label>
+                                        <label class="label-right" v-text="buildInfo.TOTAL_AREA"></label>
+                                    </div>
+                                    <div class="mui-input-row multi-line">
+                                        <div class="box label-right">
+                                            <div class="div-leftauto">建筑地址</div>
+                                            <div class="wrap" v-text="data_r.ADDRESS"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mui-input-row">
+                                        <label>建筑类型</label>
+                                        <label class="label-right" v-text="buildInfo.BUILD_TYPE_NAME"></label>
+                                    </div>
+                        </div>
+                        </div>
+                    </div>
+                        <div class="mui-bar mui-bar-tab div-bottom">
+                            <a href="#popoverDetail" type="button" class="btnSubmit mui-btn mui-btn-lightBlue mui-btn-block">关闭</a>
+                        </div>
+                    </div>
+                </div>
+                <div id="popover" class="mui-popover mui-popover-bottom mui-popover-action">
+                    <div class="divHeader ">
+                        执行人员选择
+                        <a href="#popover"><span class="mui-icon mui-icon-closeempty f-rigth "></span></a>
+                    </div>
+                    <div class="mui-scroll-wrapper" id="mui-scroll-wrapper">
+                        <div class="mui-scroll ">
+                            <ul class="mui-table-view do-persons ">
+                                <li v-for="(item,index) in list " class="mui-table-view-cell" v-cloak>
+                                    <span v-html="item.typeName"></span>
+                                    <div class="mui-radio mui-right f-rigth ">
+                                        <input name="cbx" v-bind:id="'cbx_'+item.id" v-bind:value="item.id" type="radio">
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="divFooter">
+                        <button v-on:tap="btnSure(true,nav.frompage)" class="mui-btn next-btn mui-btn-lightBlue ">确认</button>
+                    </div>
+                </div>
+
+                <script type="text/javascript" src="../../../js/mui.min.js"></script>
+                <script type="text/javascript" src="../../../js/libs/mui.zoom.js"></script>
+                <script type="text/javascript" src="../../../js/libs/mui.previewimage.js"></script>
+                <script type="text/javascript" src="../../../js/libs/mui.picker.min.js"></script>
+                <script type="text/javascript" src="../../../js/common/config.js"></script>
+
+                <script src="../../../js/common/webSql.js"></script>
+                <script src="../../../js/libs/mock-min.js"></script>
+                <script type="text/javascript" src="../../../js/common/global.js"></script>
+                <script src="../../../js/common/mockdata.js"></script>
+
+                <script type="text/javascript" src="../../../js/libs/vue.min.js"></script>
+                <script type="text/javascript" src="../../../js/app/home/work-detail.js"></script>
+                <script type="text/javascript" src="../../../js/app/home/divWaitDispatching.js"></script>
+                <script type="text/javascript">
+                    var btnArray = ['取消', '呼叫'];
+                    var vm = new Vue({
+                        el: '#mui-content',
+                        data: {
+                            bcolor: '',
+                            wordsLength: 12, //控制折叠展开的数字长度
+                            statusName: '',
+                            targetUrl: '',
+                            where: {
+                                STATE: null,
+                                ORG_CODE: config.ORG_CODE,
+                                NO: '',
+                                REPORT_TIME_bt: null,
+                                REPORT_TIME_et: null
+                            },
+                            data_r: {
+                                FAULT_TYPE: '',
+                                BUILD_NAME: '建筑名称'
+                            },
+                            buildInfo: { CONTACT: '', TEL: '' },//建筑详情
+                            data_p: {},
+                            data_money: {},
+                            count_money: 0,
+                            files: [],
+                            sltList: [], //维修耗材界面选中的记录
+                            Judge: {
+                                msg: ''
+                            },
+                            GetFaultTypeList: [],
+                            AddOrEditTxt:'添加'
+                        },
+                        mounted: function () {
+                            var _seft = this;
+                            persons.typeid = TaskType.repair.value;
+                            initEvent(this);
+                            g.initScroll({
+                                id: "scrollDiv",
+                                h: "100px"
+                            });
+                        },
+                        methods: {
+                            //编辑联系人信息
+                            editUser:function(item){
+							    mui.toast("编辑联系人信息");
+                            },
+                            //呼叫
+                            call:function(item){
+                                var _info = item.CONTACT + "     " + item.TEL;
+                                mui.confirm(_info, '呼叫确认', btnArray, function(e) {
+                                    if(e.index == 1) {
+                                        plus.device.dial(item.TEL, false);
+                                    }
+                                });
+                            },
+                            //建筑详情
+                            buildDetail: function () {
+                                mui('#popoverDetail').popover('toggle');
+                            },
+                            //获取详情
+                            getDetail: function () {
+                                vm.files = [];
+                                vm.data_r = [];
+                                vm.Judge = {};
+                                vm.data_money = {};
+                                if (g.getNetStatus()) {
+                                    if (config.isMock) {
+                                        console.log('nav.uid:' + nav.uid)
+                                        //GetRepairBill
+                                        _database.read('tb_repairbill_g', "where NO='" + nav.uid + "'", function (res) {
+                                            console.log('res:' + JSON.stringify(res))
+                                            let data = {
+                                                "StatusCode": 200,
+                                                "Message": null,
+                                                "Data": res
+                                            };
+                                            if (data.Data.length > 0) {
+                                                vm.data_r = data.Data[0];
+                                                if (vm.data_r.hasOwnProperty('BOOK_TIME')) {
+                                                    vm.data_r.BOOK_TIME = g.formatDate(vm.data_r.BOOK_TIME, 'YMDHMS');
+                                                }
+                                                vm.getBuildInfo(vm.data_r.BUILD_ID);
+                                            }
+                                        });
+                                        //GetBillFile
+                                        _database.read('tb_billfile_g', "where BILL_NO='" + nav.uid + "'", function (res) {
+                                            console.log('res:' + JSON.stringify(res))
+                                            let data = {
+                                                "StatusCode": 200,
+                                                "Message": null,
+                                                "Data": res
+                                            };
+                                            vm.files = data.Data;
+                                        });
+                                    } else {
+                                        //在加载数据之前情况数据
+                                        g.ajax(config.GetRepairBill, {
+                                            data: vm.where,
+                                            success: function (data) {
+                                                console.log('获取工单详情success:' + JSON.stringify(data))
+                                                if (data.Data.length > 0) {
+                                                    vm.data_r = data.Data[0];
+                                                    if (vm.data_r.hasOwnProperty('BOOK_TIME')) {
+                                                        vm.data_r.BOOK_TIME = g.formatDate(vm.data_r.BOOK_TIME, 'YMDHMS');
+                                                    }
+                                                    vm.getBuildInfo(vm.data_r.BUILD_ID);
+                                                }
+                                                //initBack(vm);
+                                            }
+                                        });
+                                        g.ajax(config.GetBillFile, {
+                                            data: {
+                                                BILL_NO: vm.where.NO,
+                                                BUSINESS_TYPE: BillType.wx.value
+                                            },
+                                            success: function (data) {
+                                                console.log('GetBillFile;' + JSON.stringify(data))
+                                                vm.files = data.Data;
+                                            }
+                                        });
+                                        g.ajax(config.GetJudge, {
+                                            data: {
+                                                BILL_NO: vm.where.NO
+                                            },
+                                            success: function (data) {
+                                                if (data.Data[0] != null && data.Data[0] != []) {
+                                                    vm.Judge = data.Data[0];
+                                                }
+                                                if (vm.Judge) {
+                                                    if (vm.Judge.SCORE == '1') {
+                                                        vm.Judge.msg = '很不满意';
+                                                    } else if (vm.Judge.SCORE == '2') {
+                                                        vm.Judge.msg = '不满意';
+                                                    } else if (vm.Judge.SCORE == '3') {
+                                                        vm.Judge.msg = '一般';
+                                                    } else if (vm.Judge.SCORE == '4') {
+                                                        vm.Judge.msg = '满意';
+                                                    } else if (vm.Judge.SCORE == '5') {
+                                                        vm.Judge.msg = '非常满意';
+                                                    } 
+                                                }
+                                            }
+                                        });
+                                        g.ajax(config.GetRepairPart, {
+                                            data: {
+                                                BILL_NO: vm.where.NO,
+                                                ORG_CODE: config.ORG_CODE
+                                            },
+                                            success: function (data) {
+                                                if (data && data.Data) {
+                                                    vm.data_money = data.Data;
+                                                    var _allMoney = 0;
+                                                    for (var i = 0; i < data.Data.length; i++) {
+                                                        _allMoney += parseInt(data.Data[i].MONEY);
+                                                    }
+                                                    vm.count_money = _allMoney;
+                                                }
+                                            }
+                                        });
+                                    }                                   
+                                } else {
+                                    _database.read(smp_tb.repair_tb, "where NO='" + vm.where.NO + "'", function (res) {
+                                        vm.data_r = res[0];
+                                        if (vm.data_r.hasOwnProperty('BOOK_TIME')) {
+                                            vm.data_r.BOOK_TIME = g.formatDate(vm.data_r.BOOK_TIME, 'YMDHMS');
+                                        }
+                                        //console.log("详情：" + JSON.stringify(res));//成功
+                                    });
+                                    _database.read(smp_tb.img_tb, "where NO='" + vm.where.NO + "'", function (res) {
+                                        //console.log("图片：" + JSON.stringify(res));//成功
+                                        vm.files = res;
+                                        //if (res.length > 0) {
+                                        //    for (var i = 0; i < res.length; i++) {
+                                        //        console.log('NO' + i + ":" + res[i].NO);
+                                        //        console.log('SUB_TYPE' + i + ":" + res[i].SUB_TYPE);
+                                        //        console.log('fullLocalImgUrl:' + i + ":" + res[i].fullLocalImgUrl);
+                                        //        console.log('imgblog' + i + ":" + res[i].imgblog);
+                                        //    }
+                                        //}
+                                    });
+                                    g.closeWaiting();
+                                    if (nwaiting) {
+                                        nwaiting.close();
+                                    }
+                                }
+                            },
+                            getBuildInfo: function (bid) {
+                                getBuildInfoFun(bid, vm);
+                            },
+                            getRepairSourceName: function (type) {
+                                if (type == RepairSource.tel.value) {
+                                    return RepairSource.tel.name
+                                } else if (type == RepairSource.app.value) {
+                                    return RepairSource.app.name
+                                } else if (type == RepairSource.pc.value) {
+                                    return RepairSource.pc.name
+                                } else if (type == RepairSource.wechat.value) {
+                                    return RepairSource.wechat.name
+                                }
+                            },
+                            //获取报修图片显示地址
+                            getImg: function (img, type) {
+                                //console.log('img:' + JSON.stringify(img))
+                                if (img != null) {
+                                    if (img.FILE_PATH) {
+                                        console.log(img.FILE_PATH.indexOf('file:'));
+                                        if (img.FILE_PATH.indexOf('file:') != -1) {
+                                            return img.FILE_PATH;
+                                        }
+                                    }
+                                    if (img.imgblog) {
+                                        var src = img.fullLocalImgUrl == '' ? img.imgblog : img.fullLocalImgUrl;
+                                        //console.log('src1:' + src)
+                                        return src;
+                                    }
+                                    if (img.FILE_TRUEPATH) {
+                                        var apiIP = config.apiDomain.substring(0, config.apiDomain.length - 1);
+                                        if (type == RepairSource.pc.value) {
+                                            apiIP = config.pcDomain.substring(0, config.pcDomain.length - 1);
+                                        }
+                                        var src = apiIP + img.FILE_TRUEPATH.replace(/\\/g, "/");
+                                        console.log('图片显示：' + src);
+                                        return src;
+                                    }
+                                }
+                            },
+                            //刷新页面
+                            reFresh: function (obj) {
+                                console.log('reFresh' + JSON.stringify(obj));
+                                console.log('reFresh' + obj.STATE);
+                                if (obj.STATE != undefined && obj.STATE != '') {
+                                    nav.show_Ctr(obj.STATE, obj.isWating);
+                                    nav.statusid = obj.STATE;
+                                    vm.statusName = g.getStatusNameById(nav.statusid, true);
+                                }
+                                nav.NoRepertoryTxt = "无库存提醒";
+                                nav.OverOrderIng = false;
+                            }
+                        }
+                    });
+                    //刷新建筑信息
+                    function refleshBuildInfo(name,tel) {
+                        console.log('item:' + name+","+tel);
+                        vm.buildInfo.CONTACT = name;
+                        vm.buildInfo.TEL = tel;
+                    }
+                </script>
+</body>
+
+</html>

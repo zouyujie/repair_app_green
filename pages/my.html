@@ -1,0 +1,236 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/base.css" />
+		<link rel="stylesheet" href="../css/app/my.css" />
+		<script type="text/javascript" src="../js/libs/flexible.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<div class="divset">
+				<a id="btnSetting" class="mui-icon iconfont icon-shezhi"></a>
+			</div>
+		</header>
+		<div id="app" class="mui-content bc">
+			<div class="user-header">
+				<div class="user-portrait">
+					<div class="portrait-img fl"><img src="" id="head-img" onerror="this.src = '../img/tab_3.png'"/></div>
+					<!--onerror="this.src = '../img/tab_3.png'"-->
+					<div class="portrait-userinfo fl">
+						<p class="portrait-name" v-text="userName"></p>
+						<p class="portrait-job" v-text="roleName"></p>
+					</div>
+				</div>
+			</div>
+			<div v-if="appRole!=comm.pm" class="user-release margin-bottom-10">
+				<a v-on:tap="prize()" class="user-item clear orange-red noborder">
+					<i class="mui-icon iconfont icon-jinqian"></i>
+					<span class="title">奖励金额</span>
+					<div class="release-right">
+						<i class="mui-icon mui-icon-arrowright"></i>
+					</div>
+					<span class="fr spn-money"><span v-text="Rewards.Amount_Month"></span>元</span>
+				</a>
+			</div>
+			<div class="user-release margin-bottom-10">
+				<a class="user-item clear blue" id="dataCenter">
+					<i class="mui-icon iconfont icon-shujutongji"></i>
+					<span class="title">数据中心</span>
+					<div class="release-right">
+						<i class="mui-icon mui-icon-arrowright"></i>
+					</div>
+				</a>
+			</div>
+			<div class="user-release margin-bottom-10">
+				<a class="user-item clear green noborder" id="address-book">
+					<i class="mui-icon iconfont icon-tongxunlu"></i>
+					<span class="title">通讯录</span>
+					<div class="release-right">
+						<i class="mui-icon mui-icon-arrowright"></i>
+					</div>
+				</a>
+			</div>
+			<div class="user-table">
+				<a class="user-item clear purple" id="help">
+					<i class="mui-icon iconfont icon-help"></i>
+					<span class="title">帮助</span>
+					<div class="release-right">
+						<i class="mui-icon mui-icon-arrowright"></i>
+					</div>
+				</a>
+				<a class="user-item clear purple" id="feedback">
+					<i class="mui-icon iconfont icon-icon18"></i>
+					<span class="title">反馈</span>
+					<div class="release-right">
+						<i class="mui-icon mui-icon-arrowright"></i>
+					</div>
+				</a>
+			</div>
+		</div>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../js/libs/h.js"></script>
+		<script type="text/javascript" src="../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../js/common/config.js"></script>
+        <script src="../js/common/webSql.js"></script>
+        <script src="../js/libs/mock-min.js"></script>
+		<script type="text/javascript" src="../js/common/global.js" charset="utf-8"></script>
+        <script src="../js/common/mockdata.js"></script>
+		<script type="text/javascript" src="../js/libs/multipleUploader.js"></script>
+        <script src="../js/app/my/my.js"></script>
+		<script type="text/javascript">
+		  var PUNCH_SITE = '';
+			var defaultUrl = "../img/tab_3.png";
+			var app = new Vue({
+				el: '#app',
+				data: {
+					face: '', //头像
+					userName: '',
+					roleName: '',
+					tag: '',
+					nowTime: g.getTimeNow(),
+					appRole: g.AppRoleType, //app角色类型
+					repairTitle: (g.AppRoleType == comm.repairman) ? '我的报修' : '我的维修单',
+					Rewards:{}
+				},
+				mounted: function() {
+				    mui.init();
+					var _self = this;
+					mui.ready(function() {
+						var userInfo = g.getUserInfo();
+						if (userInfo != null && userInfo.USER_ID) {
+							//console.log(userInfo.USER_ID);
+							_self.userName = userInfo.NAME;
+							_self.roleName = userInfo.ROLE_NAME;
+							_self.face = userInfo.FACE;
+							defaultUrl = userInfo.GENDER == 1 ? '../img/tab_3.png' : '../img/tab_0.png';
+						}
+						eventListener();
+						loadRewards();
+						InitHeaderPic(); //获取头像
+						//if(_self.appRole == comm.repairman || _self.appRole == comm.leader) {
+						//    loadRewards();
+					    //}
+					})
+					mui.plusReady(function() {
+							g.getCurrentPosition(initAddress);
+						//g.initHeadImg("head-img", defaultUrl);
+						setTimeout(function() {
+							g.initImgPreview("#head-img");
+						}, 200);
+						var vw = plus.webview.currentWebview();
+						if(_self.appRole == comm.repairman || _self.appRole == comm.leader) {
+							vw.addEventListener("show", loadRewards, false);
+						}
+					})
+				},
+				methods: {
+					//奖励金额
+					prize: function() {
+						var _id = "my/prize.html";
+						g.openWindow({ //目标页面
+							id: _id,
+							url: _id,
+							extras: {
+								Rewards: app.Rewards
+							}
+						});
+					}
+				}
+			})
+			function loadRewards() {
+				//console.log('loadRewards')
+				g.ajax(config.BillRewardForUser, {
+					data: {
+						userId: config.USER_ID
+					},
+					success: function(data) {
+					    console.log('data:'+JSON.stringify(data))
+						if(data.StatusCode == '200' && data.Data) {
+							//console.log(JSON.stringify(data.Data))
+						    app.Rewards = data.Data;
+						}
+					}
+				})
+			}
+			function showImg() {
+				h("#head-img").attr('src', smpCurUrl);
+			}
+			function eventListener() {
+				//数据统计
+				h("#dataCenter").tap(function() {
+					g.openWindowWithTitle({
+						url: "my/data-center.html",
+						id: "data-center"
+					}, '数据中心')
+				})
+				//更换头像
+				//				h("#head-img").tap(function() {
+				//					showActionSheet({
+				//						id: 'head-img',
+				//						multiple: false,
+				//						showDetaiFun: showImg
+				//					})
+				//				});
+				//设置
+				h('#btnSetting').tap(function () {
+				    g.openWindow({
+				        id: 'setting',
+				        url: 'my/setting.html',
+				        extras: {
+				            imgUrl: h("#head-img").attr('src'),
+				            userName: app.userName
+				        }
+				    });
+				})
+				//帮助
+				h("#help").tap(function() {
+					g.openWindowWithTitle({
+						url: "my/help.html",
+						id: "help"
+					}, '帮助')
+				})
+				//反馈
+				h("#feedback").tap(function() {
+					g.openWindowWithTitle({
+						url: "my/feedback.html",
+						id: "feedback"
+					}, '意见和反馈')
+				})
+				//通讯录
+				h("#address-book").tap(function() {
+					g.openWindowWithTitle({
+						url: "my/address-book.html",
+						id: "address-book"
+					}, '通讯录')
+				})
+				//我的消息
+				h("#news").tap(function() {
+					g.openWindowWithTitle({
+						url: "my/news.html",
+						id: "news"
+					}, '我的消息')
+				})
+			}
+			//自动更新当前时间
+			setInterval(function () {
+			    app.nowTime = g.getTimeNow()
+			}, 1000);
+            //刷新头像
+			function refreshHeadImg() {
+			    console.log('refreshHeadImg');
+			    g.initHeadImg("head-img", defaultUrl);
+			}
+			//初始化地址信息
+			function initAddress(address) {
+				PUNCH_SITE=address;
+				}
+		</script>
+	</body>
+
+</html>

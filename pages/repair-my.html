@@ -1,0 +1,189 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="../css/mui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/app/my.css" />
+    <script type="text/javascript" src="../js/libs/flexible.js"></script>
+    <style type="text/css">
+    .user-header { height: 5rem;padding-top: 0.9rem;}
+    .user-portrait,.portrait-userinfo { width: 100%;text-align: center;}
+    .user-portrait .portrait-img,
+    .portrait-userinfo {margin: 0px;}
+    .user-portrait .portrait-img img { width: 2rem; }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="mui-content bc">
+        <div class="user-header">
+            <div class="user-portrait">
+                <div class="portrait-img" style="width:100%;"><img src="" id="head-img" onerror="this.src = '../img/tab_3.png'" /></div>
+                <div class="portrait-userinfo">
+                    <p class="portrait-name" v-text="userName"></p>
+                    <p class="portrait-job" v-text="roleName"></p>
+                </div>
+            </div>
+        </div>
+        <div class="user-release margin-bottom-10">
+            <a class="user-item clear green noborder" id="address-book">
+                <i class="mui-icon iconfont icon-tongxunlu"></i>
+                <span class="title">通讯录</span>
+                <div class="release-right">
+                    <i class="mui-icon mui-icon-arrowright"></i>
+                </div>
+            </a>
+        </div>
+        <div class="user-table margin-bottom-10">
+            <a class="user-item clear purple" id="help">
+                <i class="mui-icon iconfont icon-help"></i>
+                <span class="title">帮助</span>
+                <div class="release-right">
+                    <i class="mui-icon mui-icon-arrowright"></i>
+                </div>
+            </a>
+            <a class="user-item clear purple" id="feedback">
+                <i class="mui-icon iconfont icon-icon18"></i>
+                <span class="title">反馈</span>
+                <div class="release-right">
+                    <i class="mui-icon mui-icon-arrowright"></i>
+                </div>
+            </a>
+        </div>
+        <div class="user-table margin-bottom-10">
+            <a class="user-item clear blue" id="btnSetting">
+                <i class="mui-icon iconfont icon-shezhi1"></i>
+                <span class="title">设置</span>
+                <div class="release-right">
+                    <i class="mui-icon mui-icon-arrowright"></i>
+                </div>
+            </a>
+            <a class="user-item clear blue" id="about">
+                <i class="mui-icon iconfont icon-guanyu"></i>
+                <span class="title">关于</span>
+                <div class="release-right">
+                    <i class="mui-icon mui-icon-arrowright"></i>
+                </div>
+            </a>
+        </div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell logout" id="logout">
+                <a>退出登录</a>
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript" src="../js/mui.min.js"></script>
+    <script type="text/javascript" src="../js/libs/h.js"></script>
+    <script type="text/javascript" src="../js/libs/vue.min.js"></script>
+    <script type="text/javascript" src="../js/common/config.js"></script>
+    <script src="../js/common/webSql.js"></script>
+    <script src="../js/libs/mock-min.js"></script>
+    <script src="../js/common/mockdata.js"></script>
+    <script type="text/javascript" src="../js/common/global.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/libs/multipleUploader.js"></script>
+    <script src="../js/app/my/my.js"></script>
+    <script type="text/javascript">
+    	mui.init();
+        var defaultUrl = "../img/tab_3.png";
+        var btnArray = ['取消', '确定'];
+        var app = new Vue({
+            el: '#app',
+            data: {
+                userName: 'admin',
+                roleName: 'admin'
+            },
+            mounted: function () {          
+                var _self = this;
+                mui.ready(function () {
+                    var userInfo = g.getUserInfo();
+                    if (userInfo!=null&&userInfo.USER_ID) {
+                        console.log(userInfo.NAME);
+                        _self.userName = userInfo.NAME;
+                        _self.roleName = userInfo.ROLE_NAME;
+                        defaultUrl = userInfo.GENDER == 1 ? '../img/tab_3.png' : '../img/tab_0.png';
+                    }
+                    eventListener();
+                    InitHeaderPic(); //获取头像
+                })
+            },
+            methods: {}
+        })
+        function showImg() {
+            h("#head-img").attr('src', smpCurUrl);
+        }
+        function eventListener() {
+            //				//更换头像
+            //				h("#head-img").tap(function() {
+            //					showActionSheet({
+            //						id: 'head-img',
+            //						multiple: false,
+            //						showDetaiFun: showImg
+            //					})
+            //				});
+            //设置
+            h('#btnSetting').tap(function () {
+                g.openWindow({
+                    id: 'setting',
+                    url: 'my/setting.html',
+                    extras: {
+                        imgUrl: h("#head-img").attr('src'),
+                        userName: app.userName
+                    }
+                });
+            })
+            //帮助
+            h("#help").tap(function () {
+                g.openWindowWithTitle({
+                    url: "my/help.html",
+                    id: "help"
+                }, '帮助')
+            })
+            //反馈
+            h("#feedback").tap(function () {
+                g.openWindowWithTitle({
+                    url: "my/feedback.html",
+                    id: "feedback"
+                }, '意见和反馈')
+            })
+            //通讯录
+            h("#address-book").tap(function () {
+                g.openWindowWithTitle({
+                    url: "my/address-book.html",
+                    id: "address-book"
+                }, '通讯录')
+            })
+            //我的消息
+            h("#news").tap(function () {
+                g.openWindowWithTitle({
+                    url: "my/news.html",
+                    id: "news"
+                }, '我的消息')
+            })
+            //关于我们
+            h("#about").tap(function () {
+                g.openWindowWithTitle({
+                    url: 'my/about.html',
+                    id: 'about'
+                }, '关于我们');
+            })
+            //退出登录
+            h("#logout").tap(function () {
+                mui.confirm('确定退出登录吗？', '退出确认', btnArray, function (e) {
+                    if (e.index == 1) {
+                        g.logout();
+                    }
+                });
+            });
+        }
+        //刷新头像
+        function refreshHeadImg() {
+            g.initHeadImg("head-img", defaultUrl);
+        }
+    </script>
+</body>
+
+</html>

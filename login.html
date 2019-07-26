@@ -1,0 +1,140 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="css/mui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/app/login.css" />
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+	    <h1 class="mui-title">维修平台登录</h1>
+	</header>
+    <div class="mui-content">
+        <div class="login-div"><img src="logo/logo.png" class="login-logo"></div>
+        <!--<div style="text-align: center;">
+          <p>维修平台</p>
+        </div>-->
+        <form id='login-form' class="mui-input-group">
+            <div class="mui-input-row">
+                <label>账号</label>
+                <input id='account' maxlength="12" type="text" class="mui-input-clear mui-input" placeholder="请输入账号">
+            </div>
+            <div class="mui-input-row">
+                <label>密码</label>
+                <input id='password' maxlength="20" type="password" class="mui-input-password mui-input" placeholder="请输入密码">
+            </div>
+        </form>
+        <div class="mui-content-padded">
+            <div class="center"><button type="button" class="mui-btn mui-btn-primary center" id="login">登录</button></div>
+            <div class="link-area">
+                <!-- <a id="reset_launch">重置首次打开app</a>-->
+                <!--test html-->
+            </div>
+        </div>
+    </div>
+    <script src="js/mui.min.js"></script>
+    <script src="js/libs/md5.min.js"></script>
+    <script src="js/common/config.js"></script>
+    <script src="js/common/webSql.js"></script>
+    <script src="js/libs/mock-min.js"></script>
+    <script src="js/common/mockdata.js"></script>
+    <script src="js/common/global.js"></script>
+    <script src="js/app/login.js"></script>
+    <script type="text/javascript">
+        //localStorage.removeItem("lauchFlag");
+        //引导图函数
+        function launchScreen() {
+            initTableDataGlobal();
+            //读取本地存储，检查是否为首次启动
+            var showGuide = localStorage.getItem("lauchFlag");
+            console.log('showGuide:' + showGuide)
+            if(showGuide) { //有值，说明已经显示过了，无需显示；
+                plus.navigator.closeSplashscreen(); //关闭splash页面；
+                plus.navigator.setFullscreen(false);
+            } else {
+                localStorage.removeItem('$loginstate');
+                plus.navigator.closeSplashscreen(); //关闭splash页面；
+                //显示启动导航
+                mui.openWindow({
+                    id: 'guide', //子页面的ID
+                    url: 'guide.html', //子页面
+                    show: {
+                        aniShow: 'none'
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+            }
+        }
+        //跳转到首页
+        function toMain() {
+            var mainPage = mui.preload({
+                "id": 'index',
+                "url": 'index.html'
+            });
+            mui.fire(mainPage, 'show', null);
+            if(nwaiting) {
+                nwaiting.close();
+            }
+            mainPage.show("pop-in");
+        }
+        mui.init({
+            statusBarBackground: '#f7f7f7' //设置状态栏背景颜色
+        });
+        mui.plusReady(function () {
+            if (nwaiting) { nwaiting.close(); }
+            var self = plus.webview.currentWebview();
+            if (self.mark == undefined) {
+                launchScreen(); //启动引导页
+            } else {
+                plus.navigator.closeSplashscreen(); //关闭 splash
+            }
+            // 锁定屏幕为竖屏模式，无论设备如何旋转，屏幕都不会切换到横屏模式。
+            plus.screen.lockOrientation("portrait-primary");
+            var loginstate = localStorage.getItem('$loginstate');
+            console.log('登录状态：' + loginstate)
+            //检查 "登录状态" 开始
+            if (loginstate) {
+                toMain();
+            }
+            //检查 "登录状态/锁屏状态" 结束
+            var loginButton = g.id('login');
+            var accountBox = g.id('account');
+            var passwordBox = g.id('password');
+            if (loginButton) {
+                loginButton.addEventListener('tap', function (event) {
+                    console.log('accountBox.value:' + accountBox.value + ',' + accountBox.value.trim())
+                    var loginInfo = {
+                        account: accountBox.value.trim(),
+                        password: passwordBox.value.trim()
+                    };
+                    u.login(loginInfo, function (err) {
+                        console.log('开始回调')
+                        //mui.toast(err)
+                        if (err) {
+                            plus.nativeUI.toast(err);
+                            return;
+                        }
+                        var uuid = plus.device.uuid; //获取设备的唯一标识号
+
+                        var info = plus.push.getClientInfo();
+                        var clientid = info.clientid;
+
+                        var token=info.token;
+                        var _msg='clientid:'+clientid+'，token:'+token+',appid:'+info.appid+',appkey:'+info.appkey;
+                        //alert(_msg); 
+                        console.log(_msg);//mui.toast(clientid);//获取个推的CID 04f31660c390518b2fead4a398f6b17c 生产：40dcfdd277435140ef1ebb18079a4243
+
+                        localStorage.setItem('$uuid', uuid);
+                        mui.toast('登录成功，正在跳转...')
+                        toMain();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

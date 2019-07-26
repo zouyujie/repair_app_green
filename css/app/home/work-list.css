@@ -1,0 +1,171 @@
+/*待处理任务*/
+.mui-bar {
+	background-color: #348D7F;height: 80px;margin: 0px;padding: 0px;
+}
+.mui-card{margin: 15px 12px;box-shadow:none;/*box-shadow: 0 1px 0px #F5F5F5;*/}
+.mui-bar-nav.mui-bar .mui-icon{margin-left: 0px;}
+.mui-bar.mui-bar-nav a,
+.mui-bar.mui-bar-nav h1 {
+	color: #FFFFFF;
+}
+.mui-segmented-control.mui-scroll-wrapper .mui-scroll{width:100%;height: 40px;}
+.mui-slider-indicator.mui-segmented-control{background-color: #FFFFFF;}
+.mui-segmented-control.mui-scroll-wrapper{height:40px;}
+.mui-bar .mui-segmented-control {
+	margin-top: 44px;top: 0px;width: 100%;background-color: #FFFFFF;
+	border-bottom: 1px solid #eee;border-radius: 0px; height: 40px;line-height: 40px; 
+}
+.mui-segmented-control .mui-control-item {
+	border-left: 0px;line-height: 40px;height: 40px;
+}
+.mui-bar.mui-bar-nav h1,
+.mui-bar.mui-bar-nav a {
+	color: #FFFFFF;
+}
+.mui-bar.mui-bar-nav .mui-control-item {
+	color: #505050;height: 40px;line-height: 38px;
+}
+.mui-segmented-control .mui-control-item.mui-active {
+	background-color: #FFFFFF;color: #66B96A;
+}
+.mui-segmented-control .mui-control-item.mui-active:after {
+	width: 70%;border-width: 1px;border-style: solid;border-color: #66B96A;position: relative;
+	bottom: 0px;margin: 0 auto;left: 0%;display: block;content: '';border-style: solid;
+}
+.mui-bar-nav~.mui-content {padding-top: 84px;}
+.mui-card-header,.mui-card-footer {padding: 0px;padding-left: 8px;color: #8f8f94;}
+.mui-media-body {padding: 8px;padding-top: 2px;padding-left: 11px;}
+.mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{height:20px;line-height:20px;}
+.mui-table-view-cell {padding: 0px;}
+.mui-table-view-cell p {margin-top: 4px;color: black;}
+.mui-table-view,
+.mui-content {
+	background-color: #F5F5F5;
+}
+.mui-table-view-cell.mui-media {background-color: #FFFFFF;}
+.mui-card-header {padding: 0px 0px 0px 11px;}
+.mui-table-view:before,
+.mui-table-view:after {
+	height: 0px;
+}
+.mui-content>.mui-table-view:first-child {margin-top: 10px;}
+/**
+ * 三角形气泡
+ */
+.triangle-topright {
+	width: 0;height: 0;border-top: 44px solid #FD9D2D;border-left: 2rem solid transparent;
+}
+.font-topright {
+	font-size: 12px;z-index: 2;position: absolute;right: -4px;top: -2px;
+	transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);-o-transform: rotate(45deg);width: 43px;line-height: 43px;text-align: center;color: #FFFFFF;
+}
+.triangle-topright.green {border-top: 44px solid #56CF87;}
+.triangle-topright.red {border-top: 44px solid #FF7777;}
+.triangle-topright.gray {border-top-color: #CCCCCC;}
+.mui-media-body .middle{height: 21px;line-height: 21px;}
+.mui-media-body .middle span{line-height: 10px;padding-top: 5px;}
+.mui-badge-warning {margin-left: 5px;}
+.floatLeft {float: left;}
+.divHeader {width: 100%;text-align: center;margin: 0 auto;height: 40px;/*box-shadow: 0 0 0px #c8c7cc;*/}
+.divHeader:after{
+	position: absolute;right: 0;left: 0;height: 1px;content: '';transform: scaleY(.5);background-color: #c8c7cc;
+}
+input[type=text].txtDate {width: 110px;}
+.mui-popover {width: 100%;bottom: 242px;}
+.mui-popover.mui-popover-action .mui-table-view .mui-table-view-cell:after,.mui-table-view-cell:after {height: 0px;}
+.mui-bar.mui-bar-nav.action-head.action-head {}
+.mui-bar.mui-bar-nav.action-head.action-head>a {margin-left: 10px;}
+.mui-xbtn-primary>span {}
+.mui-iframe-wrapper {
+	z-index: 1;
+}
+.mui-poppicker {z-index: 999999;}
+.mui-android-5-1 .mui-poppicker.mui-active {min-height: 242px;}
+.divHeader>a>i.mui-icon {font-size: 16px;}
+.mui-bar-nav.mui-bar .divHeader .mui-icon.mui-icon-arrowdown {padding-left: 4px;}
+.mui-bar-nav.mui-bar .mui-icon.mui-icon-arrowdown {/*margin-left: 0px;*/}
+.divHeader.no-underline .mui-control-item.mui-active:after {border-width: 0px;}
+/*小圆点*/
+.round {
+    border-radius:50%;width: 6px;height: 6px;display: -webkit-inline-box;font-size: 6px;margin-left: -2px;
+	line-height: 6px;text-align: center;background-color: #FD7777;text-decoration: none;position: absolute;top: 5px;
+}
+.round:hover {color: blue;text-decoration: none}
+.mui-card-header:after {border-bottom: 1px dashed #c8c7cc;background-color: #FFFFFF;margin: 0 8px;}
+.divHeader.no-underline .mui-control-item.mui-active:after{border-width: 0px;} 
+.mui-card-header .spn-order{width: auto;float: left;}
+.spnOrderNO{width: 61px;float: left;}  
+#repair-datetime {top:124px;height: 225px;background: white;padding: 10px 0px;z-index:1000;}
+#repair-datetime ul{height: 165px;background-color:#FFFFFF;border-radius: 0px;margin: 0px;}
+#repair-datetime ul li{height: 40px;padding:0px 0.468px; color: black;line-height: 40px;}
+#repair-datetime ul li.mui-selected{color: #56ADFC;}
+#repair-datetime ul li a{text-align: left;margin: 0;height: 40px;line-height: 40px;padding: 0px 20px;}
+.divFooter{height: 40px;line-height: 40px;text-align: center;background-color: #FFFFFF;padding: 3px 20px;}
+.divFooter input[type='text']{width: 35%;float: left; height: 34px;padding: 5px 10px;font-size: 14px;}
+.divFooter button{float: right;margin-top: 2px;width: 50px;margin-right: 0px;}
+.divFooter span{float: left;width: 30px;}
+/*按钮*/
+.mui-xbtn-primary.mui-btn-outlined{background-color:#ffffff;color:#1F7246;}
+.divWaitDispatching button{float:right;}
+.divWaitDispatching button.b1{
+    width: 68px;height:30px;padding: 6px 6px;line-height: 1;float: left;margin-right: 8px;
+}
+/*派工*/
+.mui-table-view.do-persons{background-color:white;} 
+.mui-popover.mui-popover-action .mui-table-view.do-persons{color: black;margin:0px;}
+.mui-table-view.do-persons li{text-align:left;}
+.mui-table-view.do-persons li .person{min-width:80px;display:inline-block;}
+ .mui-table-view.do-persons li .counts {margin-left:10px;}
+.f-rigth{float:right;}
+.f-rigth input[type=checkbox]{right:10px;}
+#popover,#popover-persons{height:250px;background-color:#ffffff;position:fixed;z-index:999;bottom:0px;}
+#popover .divHeader{height:40px;line-height:40px;text-align:center;width:100%;background-color: #F5F5F5;}
+#popover .divHeader span.mui-icon{margin-top:8px;margin-right:20px;color:#B4B4B4;}
+.mui-popover .mui-scroll-wrapper{position:relative;margin:0px;}
+#popover .divFooter{height:40px;line-height:40px;text-align:center;margin-left:10%;width:100%;padding: 5px 0;}
+#popover .divFooter button{width:80%;float:none;}
+.icon-kucun.orange{color:#F77A12;}
+.do-persons .mui-table-view-cell{ padding: 11px 15px;}
+/*------------------------------*/
+.mui-popover.mui-popover-bottom.mui-popover-action .mui-table-view .mui-table-view-cell:after, .mui-table-view-cell:after{height:1px;}
+#popover .mui-checkbox input[type=checkbox], .mui-radio input[type=radio] {line-height: 40px;top: -9px;}
+.mui-popover .mui-table-view .mui-table-view-cell:first-child, .mui-popover .mui-table-view .mui-table-view-cell:first-child>a:not(.mui-btn),
+.mui-popover .mui-table-view .mui-table-view-cell:last-child, .mui-popover .mui-table-view .mui-table-view-cell:last-child>a:not(.mui-btn)
+{
+	border-radius: 0px;
+}
+.mui-segmented-control{font-size: 16px;}
+.mui-segmented-control.two{font-size: 14px;}
+.divHeader.no-underline:after{height: 0px;}
+.font-seal {
+	font-size: 12px;z-index: 2;position: absolute;right:14px;top: 35px;    border: 1px solid #F73A3C;
+	transform: rotate(45deg);width: 53px;line-height: 20px;text-align: center;color: #F73A3C;font-weight: bold;
+}
+.mui-media-body{height: 84px;/*display: table;*/ }
+.middle-inner{vertical-align: middle;/*display: table-cell;*/ }
+.middle-inner.ptop{padding-top: 11.5px;}
+/*-------------人员类型-----------*/
+/*#popover-persons{height:350px;}
+#popover-persons .mui-scroll-wrapper{height:260px;}
+.icons.mui-inline i{color: #F77A12;}
+.mui-input-group:after{height: 0px;}*/ 
+/*.divHeader.one:after {
+	position: absolute;
+	right: 0;
+	left: 0;
+	height: 1px;
+	content: '';
+	transform: scaleY(.5);
+	background-color: #c8c7cc;
+}*/
+.mui-card .mui-table-view .mui-table-view-cell:first-child, .mui-card .mui-table-view .mui-table-view-divider:first-child{border-top-left-radius: 2px;border-top-right-radius: 2px;}
+.mui-bar-tab~.mui-content{height:100%;background-color:#F5F5F5;position:fixed;}
+#pullrefresh>ul{padding-bottom:0.1px;}
+.mui-card-footer span:first-child{ overflow: hidden;white-space: nowrap;max-width:44%;}
+#pullrefresh{overflow:auto;}
+/*.mui-pull-bottom-pocket{bottom:0px;position: absolute;}*/
+.mui-off-canvas-wrap{min-height:200px;}
+.blue{
+    color:#66B96A !important;
+}

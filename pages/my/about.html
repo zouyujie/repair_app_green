@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>关于我们</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+	</head>
+
+	<body>
+		<!--<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">关于我们</h1>
+		</header>-->
+		<div id="app" class="mui-content default-bg">
+			<div class="div-header">
+				<div class="portrait-img"><img src="../../logo/80x80.png" /></div>
+				<div class="div-info"><span v-text="title"></span><span class="version" v-cloak>V{{version}}</span></div>
+			</div>
+			<ul class="mui-table-view nospace">
+				<li class="mui-table-view-cell mui-collapse mui-active">
+					<a class="mui-navigate-right" href="#">维修平台介绍</a>
+					<div class="mui-collapse-content">
+						<div class="text-indent">维修平台项目是....</div>
+						<div>网址：<span v-text="apiUrl"></span></div>
+					</div>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell" id="logout">
+					客服电话 <span class="fr">0755-xxxxxxxx</span>
+				</li>
+			</ul>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+		<script type="text/javascript">
+			//org_code_rolename_appid
+			//dosend("secom_M_ASDFASDF");
+			var app = new Vue({
+				el: "#app",
+				data: {
+					apiUrl: config.apiDomain, //接口域名
+					title: config.appTitle, //系统标题
+					version: '' //版本号
+				},
+				mounted: function () {
+				    mui.init();
+					var _self = this;
+					mui.plusReady(function () {
+					     plus.runtime.getProperty(plus.runtime.appid,function(inf){
+                           _self.version=inf.version;
+                       });
+					})
+				},
+				methods: {}
+			});
+		</script>
+	</body>
+
+</html>

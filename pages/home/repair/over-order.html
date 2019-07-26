@@ -1,0 +1,441 @@
+﻿<!doctype html>
+<html class="feedback">
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../../css/mui.picker.min.css" />
+		<link href="../../../css/base.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../../css/feedback-page.css" />
+		<link href="../../../css/app/home/work-detail.css" rel="stylesheet" />
+        <style type="text/css">
+            .mui-input-row.smp-desc:after{height:1px;background-color:#ddd;}
+            .mui-bar-tab~.mui-content{height:100%;background-color:#F5F5F5;}
+            .smp-desc-info{padding-bottom: 0px;}
+        </style>
+	</head>
+
+	<body>
+		<div id="app" class="mui-fullscreen" style="background-color: #FFFFFF;">
+			<header class="mui-bar mui-bar-nav">
+				<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 class="mui-title">填写维修完工内容</h1>
+			</header>
+			<nav class="mui-bar mui-bar-tab reversal">
+				<button id="btnSubmit" v-on:tap="btnSubmit()" class="mui-btn next-btn mui-btn-primary">提交</button>
+			</nav>
+			<div class="mui-content">
+				<div class="smp-content-padded">
+					<form class="mui-input-group">
+						<div>
+							<div class="collapse-content" style="height: 145px;">
+								<label class="row-label"></label>
+								<div id='F_SMPS' class="row image-list">
+									<a href="#" id="F_SMP" onclick="showActionSheet({ id: 'F_SMP', multiple: true })">
+										<span class="mui-icon mui-icon-camera paizhao require"><span class="require-txt">必填</span></span>
+									</a>
+								</div>
+							</div>
+							<div class="smp-desc-info">
+								<div class="mui-input-row smp-desc">
+									<textarea rows="3" placeholder="请填写完工后情况(必填)..." v-model="data_v.FINISH_INFO"></textarea>
+								</div>
+								<div class="mui-input-row no-bottom require" v-on:tap="faultType()">
+									<label><i>*</i>故障类型</label>
+									<input type="text" id='userResult' placeholder="请选择故障类型" readonly="readonly" class="mui-navigate-right" />
+									<i class="mui-icon mui-icon-arrowright gofr"></i>
+								</div>
+								<div class="smp-line"></div>
+								<div id="consumeList">
+									<div class="mui-card nospace">
+										<ul id="ulConsume" class="mui-table-view nospace">
+											<li v-for="(item,index) in sltList" class="mui-table-view-cell nospace">
+												<!--<div class="mui-slider-right mui-disabled">
+													<a class="mui-btn mui-btn-red" v-on:tap="deleteRow(item,$event)">删除</a>
+												</div>-->
+												<div class="mui-slider-handle">
+													<label v-text="item.name"></label>
+													<div class="font-right"><span v-text="item.count"></span><span>个</span></div>
+													<div class="div-little"><span v-text="item.code"></span><span v-text="item.unitprice"></span></div>
+												</div>
+											</li>
+										</ul>
+									</div>
+									<div class="mui-input-row no-bottom" v-on:tap='addConsumable()'>
+										<label class="lable-haocai"><span class="mui-icon mui-icon-plus"></span>添加<span v-show="sltList.length>0">/编辑维修</span>耗材</label>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+		<script src="../../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../../js/libs/vue.min.js"></script>
+        <script type="text/javascript" src="../../../js/libs/mui.zoom.js"></script>
+        <script type="text/javascript" src="../../../js/libs/mui.previewimage.js"></script>
+		<script type="text/javascript" src="../../../js/libs/multipleUploader.js"></script>
+		<script type="text/javascript" src="../../../js/libs/mui.picker.min.js"></script>
+		<script type="text/javascript" src="../../../js/common/config.js"></script>
+
+        <script src="../../../js/common/webSql.js"></script>
+        <script src="../../../js/libs/mock-min.js"></script>
+        <script type="text/javascript" src="../../../js/common/global.js"></script>
+        <script src="../../../js/common/mockdata.js"></script>
+
+		<script type="text/javascript">
+            var _database = new smpWebSql();
+			var curView = null; //当前webview
+			var wo = null; //父webview
+			var ppView = null; //上上webview
+			var btnArray = ['取消', '确定'];
+			mui.init();
+			mui.previewImage();
+			var old_back = mui.back;
+			mui.back = function () {
+			    //判断是否打开图片预览，如果是，就先关掉图片，否则直接关闭当前页面
+			    if (document.querySelector(".mui-preview-in")) {
+			        mui.previewImage().close();
+			        return;
+			    } else {
+			        mui.confirm('完工内容未提交，确认离开吗？', '离开确认', btnArray, function (e) {
+			            if (e.index == 1) {
+			                //执行mui封装好的窗口关闭逻辑；
+			                old_back();
+			                setTimeout(function () { old_back() }, 300);//解决回退不了的问题
+			                console.log('sltImgCount:' + sltImgCount)
+			            }
+			        });
+			    }
+			}
+			var app = new Vue({
+				el: '#app',
+				data: {
+					tag: '',
+					data_v: {
+					    NO:'',
+					    FINISH_SIGN: config.USER_ID,
+						FINISH_TIME: g.formatDate('D', 'YMDHMS'),
+						STATE: WorkOrderStatus.waitOver.value,
+						FAULT_TYPE: '',
+						ORG_CODE: config.ORG_CODE,
+						CREATE_USER_ID: config.USER_ID,
+					    FINISH_INFO:''
+					},
+					list: [], //记录耗材页面的记录
+					sltList: [] //维修耗材界面选中的记录
+				},
+				methods: {
+					//添加/编辑维修耗材
+					addConsumable: function() {
+						mui.openWindow({
+							id: 'repair-consumable.html',
+							url: 'repair-consumable.html',
+							extras: {
+								list: app.list
+							}
+						})
+					},
+					//删除行记录
+					deleteRow: function(item, event) {
+						mui.confirm('确认删除该条记录？', '删除确认', btnArray, function(e) {
+							var li = event.target.parentNode.parentNode;
+							//回复删除按钮状态
+							setTimeout(function() {
+								mui.swipeoutClose(li);
+							}, 0);
+							if(e.index == 1) {
+								//li.parentNode.removeChild(li);
+								app.list.removeByValue(item);
+							}
+						});
+					},
+					faultType: function() {
+						var userPicker = new mui.PopPicker();
+						var dv = [];
+						if (g.getNetStatus()) {
+						    g.ajax(config.GetFaultType, {
+						        dataType: 'json', //服务器返回json格式数据
+						        type: 'get',
+						        success: function (data) {
+						            for (var i = 0; i < data.Data.length; i++) {
+						                var d = {};
+						                d.text = data.Data[i].NAME;
+						                d.value = data.Data[i].CODE;
+						                dv.push(d);
+						            }
+						            userPicker.setData(dv);
+						            userPicker.show(function (items) {
+						                if (items) {
+						                    userResult.value = items[0].text;
+						                    app.data_v.FAULT_TYPE = items[0].value;
+						                }
+						            });
+						        }
+						    });
+						} else { //如果没网从本地取
+						    _database.read(smp_tb.fault_type_tb, '', function (res) {
+						        userPicker.setData(res);
+						        userPicker.show(function (items) {
+						            userResult.value = items[0].text;
+						            app.data_v.FAULT_TYPE = items[0].value;
+						        });
+						    });
+						}
+					},
+					//提交数据
+					btnSubmit: function () {
+						if(smpImgArray.length==0){							
+							mui.toast('请上传图片');
+							return;
+						}						  
+						else if(g.isEmpty(app.data_v.FINISH_INFO)) {
+							mui.toast('请填写完工描述');
+							return;
+						}
+						else if(g.isEmpty(app.data_v.FAULT_TYPE)) {
+							mui.toast('请选择故障类型');
+							return;
+						}
+						var userId = config.USER_ID;
+
+						var v = [];
+						for(var i = 0; i < app.sltList.length; i++) {
+							var o = app.sltList[i],
+								dv = {};
+							var money = (parseInt(o.count) * parseInt(o.unitprice));
+							dv = {
+								EQ_PART_ID: o.eq_part_id,
+								BATCH_NO: o.batch_no,
+								PRICE: o.unitprice,
+								BILL_NO: app.data_v.NO,
+								QUANTITY: o.count,
+								MONEY: money,
+								EXPORT_NO: o.export_no,
+								REPLY_USER_ID: userId,
+								ORG_CODE: config.ORG_CODE
+							}
+							v.push(dv);
+						}
+						if(v.length > 0) {
+							g.ajax(config.AddRepairPart, {
+								data: v,
+								success: function(data) {
+								    console.log('AddRepairPart耗材添加成功' + JSON.stringify(data));
+								}
+							});
+						}
+						var v = JSON.stringify(app.data_v);
+						console.log('v:'+v);
+						document.getElementById("btnSubmit").setAttribute("disabled", true);
+						if (g.getNetStatus()) {
+						    g.ajax(config.FinishRepair, {
+						        data: v,
+						        dataType: 'json', //服务器返回json格式数据
+						        type: 'post', //HTTP请求类型
+						        headers: {
+						            'Content-Type': 'application/json'
+						        },
+						        success: function (data) {
+						            console.log('FinishRepair:' + JSON.stringify(data));
+						            if (data && data.Data == '1') {
+						                if (config.isMock) {
+						                    var strRes = "";
+						                    for (var i = 0; i < smpImgArray.length; i++) {
+						                        var itemkey = smpImgArray[i];
+						                        console.log(itemkey);//file:///storage/emulated/0/Android/data/io.dcloud.HBuilder/apps/HBuilder/doc/upload/F_SMP-20181012133808632P81008-122534.jpg
+						                        strRes += '{ "Name": "' + itemkey + '","code": "' + itemkey + '" }';
+						                    }
+						                    fun('{ "StatusCode": 200, "Message": "上传成功", "Data": [' + strRes + '] }');
+						                } else {
+						                    uploadimge(config.uploadImgUrl, config.USER_ID, fun);
+						                }
+						            } else {
+						                mui.toast(data.Message);
+						            }
+						            document.getElementById("btnSubmit").disabled = false;
+						        },
+						        error: function () {
+						            document.getElementById("btnSubmit").disabled = false;
+						        }
+						    });
+						}
+						else {
+						    var imgCount = smpImgArray.length;
+						    var strData = "[";
+						    for (var i = 0; i < imgCount; i++) {
+						        strData += '{ "Name": "", "code": "" },'
+						    }
+						    strData = strData.substring(0, strData.length - 1);
+						    strData += "]";
+						    console.log('strData:' + strData)
+						    fun('{ "StatusCode": 200, "Message": "上传成功", "Data":'+strData+' }');
+						    document.getElementById("btnSubmit").disabled = false;
+						}
+					}
+				},
+				mounted: function() {
+					//mui('.mui-scroll-wrapper').scroll().scrollTo(0, 0, 100); //100毫秒滚动到顶
+					var _self = this;
+					mui.plusReady(function() {
+						curView = plus.webview.currentWebview();
+						_self.data_v.NO = curView.NO;
+						_self.tag = curView.tag || '';
+						wo = curView.opener();
+						if(curView.tag == 'detail') {
+							ppView = wo.opener(); //当前页的上上页
+						}
+					});
+					//test use
+					//_self.sltList=[{"name":"爆破螺丝","code":"BPLS_LA","unitprice":"32/6","count":2}];
+				}
+			})
+	        //图片上传成功、回调添加数据
+			var fun = function (d) {
+			    if (d) {
+			        console.log('d:' + JSON.stringify(d));//"{\"StatusCode\":200,\"Message\":\"上传成功\",\"Data\":[{\"Name\":\"F_SMP-20181011162717344P81008-122534.jpg\",\"code\":\"0bee655b-b133-464d-aa2d-5eac510f0c88\"}]}"
+			    }
+			    if (d == null || d == '' || JSON.parse(d).Data.length < 1) {
+			        mui.toast('请重新上传图片');
+			        return;
+			    }
+
+				var FILENAMES = '',
+					FILE_PATHS = '',
+					v = {};
+
+				for(var i = 0; i < JSON.parse(d).Data.length; i++) {
+					console.log(JSON.parse(d).Data[i].code);
+					FILENAMES += JSON.parse(d).Data[i].Name;
+					FILE_PATHS += JSON.parse(d).Data[i].code;
+					var j = i + 1;
+					if(j < JSON.parse(d).Data.length) {
+						FILENAMES += ',';
+						FILE_PATHS += ',';
+					}
+				}
+				console.log('FILENAMES:' + FILENAMES);
+				console.log('FILE_PATHS:' + FILE_PATHS);
+				var t = new Date();
+				v = {
+					BUSINESS_TYPE: BillType.wx.value,
+					SUB_TYPE: WorkOrderStatus.waitOver.value,
+					BILL_NO: app.data_v.NO,
+					FILENAME: FILENAMES,
+					FILE_PATH: FILE_PATHS,
+					CREATE_USER_ID: config.USER_ID,
+					CREATE_TIME: t
+				}
+
+				if(FILENAMES != '') {
+				    console.log('files' + JSON.stringify(FILENAMES))
+				    if (g.getNetStatus()) {
+				        g.ajax(config.AddBillFile, {
+				            data: v,
+				            dataType: 'json',
+				            type: 'post',
+				            success: function (data) {
+				                console.log('AddBillFile报修文件上传:' + JSON.stringify(data));
+
+				                if (data && data.Data != 0) {
+				                    mui.toast('操作成功');
+				                    // console.log('app.tag:' + app.tag + ',ppView:' + ppView.id)
+				                    if (app.tag == 'detail' && ppView) { //从详情页过来的，返回到上上页
+				                        curView.close();
+				                        g.goPrePrePage(wo, ppView, null, function () {
+				                            ppView.evalJS("refleshView(1,'" + app.data_v.NO + "','" + WorkOrderStatus.Over.value + "','" + TaskType.repair.value + "');");
+				                        });
+				                        setTimeout(old_back(), 300);
+				                    } else {
+				                        setTimeout(function () {
+				                            old_back();
+				                            console.log('回退');
+				                        }, 300);
+				                        old_back();
+				                        wo.evalJS("refleshView(1,'" + app.data_v.NO + "','" + WorkOrderStatus.Over.value + "','" + TaskType.repair.value + "');");
+				                        //wo.evalJS("getListAll()"); //刷新列表
+				                    }
+				                    console.log('报修文件上传成功');
+				                } else {
+				                    mui.toast('操作失败');
+				                }
+				            }
+				        });
+				    }
+					app.img_list = d;
+				}
+				if (!g.getNetStatus()) {
+				    if (smpImgArray.length == 0) { return; }
+				    console.log('smpImgArray:' + JSON.stringify(smpImgArray));
+				    var tagVal = 0;
+				    for (var i = 0; i < smpImgArray.length; i++) {
+				        (function (i) {
+				            //添加完工图片
+				            var imgobj = { NO: app.data_v.NO, SUB_TYPE: 'C', BUSINESS_TYPE: 'R', localImgUrl: localImgUrl, fullLocalImgUrl: smpImgArray[i], imgblog: null };
+				            //console.log('fullLocalImgUrl:' + imgobj.fullLocalImgUrl);
+				            console.log("img成功：" + JSON.stringify(imgobj));//成功
+				            _database.addBlob(smp_tb.img_tb, [imgobj], 5, true, function (res) {
+				                if (res) {
+				                    console.log("img成功：" + res);//成功
+				                }
+				                tagVal++;
+				                if (tagVal == smpImgArray.length) {
+				                    console.log('app.data_v:' + JSON.stringify(app.data_v))
+				                    //本地数据库进行记录 smp_tb.signin_img_tb
+				                    _database.add(smp_tb.over_tb, [app.data_v], function (ores) { //"FAULT_TYPE": app.data_v.FAULT_TYPE, 
+				                        if (ores) {
+				                            console.log("ores-img成功：" + ores);//成功
+				                        }
+				                    }); //config.FinishRepair
+				                    var orderObj = { "STATE": "E", "FINISH_TIME": g.operationDate(0), "FAULT_NAME": g.id("userResult").value, "FINISH_INFO": app.data_v.FINISH_INFO };
+				                    //console.log('orderObj:' + JSON.stringify(orderObj))
+				                    //本地修改工单状态、更新完工时间、
+				                    _database.update(smp_tb.repair_tb, 'NO', app.data_v.NO, orderObj, function (res) {
+				                        console.log("res:" + res);
+				                        mui.toast('离线操作成功');
+				                        console.log("app.tag:" + app.tag)
+				                        if (app.tag == 'detail' && ppView) { //从详情页过来的，返回到上上页
+				                            curView.close();
+				                            g.goPrePrePage(wo, ppView, null, function () {
+				                                ppView.evalJS("refleshView(1,'" + app.data_v.NO + "','" + WorkOrderStatus.Over.value + "','" + TaskType.repair.value + "');");
+				                            });
+				                            setTimeout(old_back(), 300);
+				                        } else {
+				                            setTimeout(function () {
+				                                old_back();
+				                                console.log('回退');
+				                            }, 300);
+				                            old_back();
+				                            wo.evalJS("refleshView(1,'" + app.data_v.NO + "','" + WorkOrderStatus.Over.value + "','" + TaskType.repair.value + "');");
+				                        }
+				                    });
+				                }
+				                //mui.toast('离线完工成功！');
+				            });
+				            //g.setBase64Img(imgobj.fullLocalImgUrl, imgobj, function (obj) {}); //添加这个有时可以添加成功，有时添加失败	
+				        })(i);
+				    }
+				}
+			}
+			//返回回来要执行的方法:加载耗材列表
+			function loadConsumeList(e) {
+				var _sltList = e.detail.sltList;
+				var _list = e.detail.list;
+				//console.log('接收数据list：' + JSON.stringify(_list))
+				//console.log('接收数据sltList：' + JSON.stringify(_sltList))
+				app.sltList = _sltList;
+				app.list = _list;
+			}
+			//自定义窗体事件  doit 要和子页面定义的 事件名称一致   
+			window.addEventListener('doit', loadConsumeList);
+		</script>
+	</body>
+
+</html>

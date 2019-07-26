@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="MobileOptimized" content="320" />
+		<title>二维码扫描</title>
+		<link rel="stylesheet" type="text/css" href="../../css/mui.min.css" />
+		<link rel="stylesheet" href="../../css/iconfont.css" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<style type="text/css">
+			#bcid {width: 100%;text-align: center;height: 100%;}		
+			.tip {color: #FFFFFF;font-weight: bold;text-shadow: 0px -1px #103E5C;padding-top: 50%;}		
+			#turnTheLight {font-size: 40px;padding-top: 0px;height: 50px;line-height: 45px;}			
+			.mui-icon.iconfont.icon-kaideng {color: #DDDDDD;}
+			.mui-icon.iconfont.icon-kaideng.mui-active {color: #66B96A;}			
+			html,body,.mui-content {height: 100%;width: 100%;background-color: #000000;}
+		</style>
+	</head>
+
+<body>
+    <nav class="mui-bar mui-bar-tab">
+        <a id="btnCancle" class="mui-tab-item">
+            取　 消
+        </a>
+        <a class="mui-tab-item"><span class="mui-icon iconfont icon-kaideng" id="turnTheLight" style="width:33%;"></span></a>
+        <a id="btnSelect" class="mui-tab-item">从相册选择</a>
+    </nav>
+    <div class="mui-content">
+        <div id="bcid">
+            <p class="tip">...将二维码放入框内，可自动扫描...</p>
+        </div>
+    </div>
+    <script src="../../js/mui.min.js"></script>
+    <script type="text/javascript">
+        var ws = null,
+			wo = null;
+        mui.init();
+
+        mui.plusReady(function () {
+
+            mui.later(startRecognize, 300);
+            //打开关闭闪光灯处理
+            var flag = false;
+            document.getElementById("turnTheLight").addEventListener('tap', function () {
+                if (flag == false) {
+                    scan.setFlash(true);
+                    this.classList.add('mui-active');
+                    flag = true;
+                } else {
+                    scan.setFlash(false);
+                    this.classList.remove('mui-active');
+                    flag = false;
+                }
+            });
+            document.getElementById("btnCancle").addEventListener('tap', function () {
+                mui.back();
+            })
+            document.getElementById("btnSelect").addEventListener('tap', function () {
+                scanPicture();
+            })
+        });
+
+        function startRecognize() {
+            scan = new plus.barcode.Barcode('bcid');
+            scan.onmarked = onmarked;
+            scan.start({
+                conserve: true,
+                filename: '_doc/barcode/'
+            });
+        }
+        // 二维码扫描成功
+        function onmarked(type, result, file) {
+            switch (type) {
+                case plus.barcode.QR: //QR二维码，数值为0
+                    type = 'QR';
+                    break;
+                case plus.barcode.EAN13: //EAN一维条形码码标准版，数值为1
+                    type = 'EAN13';
+                    break;
+                case plus.barcode.EAN8: //ENA一维条形码简版，数值为2
+                    type = 'EAN8';
+                    break;
+                default:
+                    type = '其它' + type;
+                    break;
+            }
+            //result = result.replace(/\n/g, '');
+            console.log('type:' + type + ';result:' + result + ';file:' + file);
+            //mui.toast(result);
+            //			console.log('appid:'+plus.runtime.appid)
+            //			wo = plus.webview.getWebviewById(plus.runtime.appid)
+            // 获取窗口对象
+            ws = plus.webview.currentWebview();
+            wo = ws.opener();
+            wo.evalJS("scaned('" + type + "','" + result + "','" + file + "');");
+            mui.back();
+        }
+        // 从相册中选择二维码图片
+        function scanPicture() {
+            plus.gallery.pick(function (path) {
+                plus.barcode.scan(path, onmarked, function (error) {
+                    plus.nativeUI.alert('无法识别此图片');
+                });
+            }, function (err) {
+                plus.nativeUI.alert('Failed: ' + err.message);
+            });
+        }
+    </script>
+</body>
+</html>

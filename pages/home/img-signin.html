@@ -1,0 +1,238 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>拍照签到</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="../../css/mui.min.css" rel="stylesheet" />
+    <link href="../../css/base.css" rel="stylesheet" />
+    <link href="../../css/app/home/work-detail.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id='app'>
+        <nav class="mui-bar mui-bar-tab">
+            <button type="button" id='btnSubmit' class="mui-btn mui-btn-lightBlue mui-btn-block" v-on:tap="btnSubmit()">提交</button>
+        </nav>
+        <div class="mui-content">
+            <form class="mui-input-group">
+                <div class="smp-list-info">
+                    <div class="smp-search-success"><span class="rectangle"></span><span>签到照片</span></div>
+                </div>
+                <div class="div-signin">
+                    <span class="mui-icon mui-icon-image sigini-img" v-show="!showImg"></span>
+                    <img v-show="showImg" src="" data-preview-src="" data-preview-group="1" id="signInImg" class="img-signin" />
+                    <p></p>
+                    <button type="button" id="btnCamera" class="mui-btn mui-btn-lightBlue mui-btn-outlined" style="width:30%;margin-top: 10px;">拍照签到</button>
+                </div>
+                <!--<div class="line" style="height: 15px;"></div>
+                <div class="mui-input-row l-padding">
+                    <label>签到地点</label>
+                    <label>xx</label>
+                </div>
+                <div class="mui-input-row l-padding">
+                    <label>签到时间</label>
+                    <label>xx</label>
+                </div>-->
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../js/mui.min.js"></script>
+    <script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+    <script type="text/javascript" src="../../js/common/config.js"></script>
+    <script type="text/javascript" src="../../js/common/global.js"></script>
+    <script type="text/javascript" src="../../js/libs/multipleUploader.js"></script>
+    <script type="text/javascript" src="../../js/libs/mui.zoom.js"></script>
+    <script type="text/javascript" src="../../js/libs/mui.previewimage.js"></script>
+    <script src="../../js/common/webSql.js"></script>
+    <script type="text/javascript">
+        var _database = new smpWebSql();
+        var wo = null; //父webview
+        var ppView = null; //上上webview
+        var curView = null;
+        var old_back = mui.back;
+        var app = new Vue({
+            el: "#app",
+            data: {
+                showImg: false,
+                typeid: '',
+                page: '',
+                item: [],
+                isWating:null,
+                data_v: {
+                    NO: '',
+                    STATE: WorkOrderStatus.waitSignin.value,
+                    SOURCE: 1,
+                    money: 0,
+                    hour: 0,
+                    SIGN_TIME:g.formatDate('D', 'YMDHMS')
+                } 
+            },
+            mounted: function () {
+                var _self = this;
+                mui.init();
+                mui.previewImage();
+                mui.ready(function () {
+                    eventListener();
+                })
+                mui.plusReady(function () {
+                    var self = plus.webview.currentWebview();
+                    curView = self;
+                    wo = self.opener();
+                    _self.data_v.NO = self.NO;
+                    _self.data_v.money = self.money;
+                    _self.data_v.hour = self.hour;
+                    _self.typeid = self.typeid;
+                    _self.page = self.page;
+                    _self.item = self.item;
+                    _self.isWating = self.isWating;
+                    console.log('self.isWating:' + self.isWating)
+
+                    var userInfo = g.getUserInfo();
+                    if (userInfo.USER_ID) {
+                        _self.data_v.REPORT_USER_NAME = userInfo.NAME;
+                        _self.data_v.PHONE = userInfo.PHONE;
+                        _self.data_v.ORG_CODE = userInfo.ORG_CODE;
+                        _self.data_v.REPORT_USER_ID = userInfo.USER_ID;
+                        _self.data_v.DEPT_CODE = userInfo.DEPT_CODE;
+                    }
+                    if (self.page == 'home') {
+                        ppView = wo.opener(); //当前页的上上页
+                    }
+                });
+            },
+            methods: {
+                btnSubmit: function () {
+                    if (sltImgCount == 0 || g.id("signInImg").src == "") {
+                        document.getElementById("btnSubmit").disabled=false;
+                        mui.toast('请上传图片');
+                        return;
+                    } else {
+                        document.getElementById("btnSubmit").setAttribute("disabled", true);
+                        if (g.getNetStatus()) {
+                            uploadimge(config.uploadImgUrl, config.USER_ID, fun);
+                        } else {
+                            fun('{ "StatusCode": 200, "Message": "上传成功", "Data": [{ "Name": "", "code": "" }] }');
+                            return true;
+                        }
+                    }
+                }
+            }
+        });
+
+        function eventListener() {
+            //拍照签到
+            document.getElementById('btnCamera').addEventListener('tap', function () {
+                showActionSheet({
+                    id: 'signInImg',
+                    multiple: false,
+                    //type: 'paizhao',
+                    showDetaiFun: function (name, divid, url, path) {
+                        app.showImg = true;
+                        g.id("signInImg").src = smpCurUrl;
+                    }
+                })
+            });
+        }
+        //图片上传成功、回调添加数据
+        var fun = function (d) {
+            if (d) {
+                console.log('d:' + JSON.stringify(d));
+            }
+            if (d == null || d == '' || JSON.parse(d).Data.length < 1) {
+                mui.toast('请上传图片');
+                return;
+            }
+            var v_f = {
+                BILL_NO: app.data_v.NO,
+                BUSINESS_TYPE: BillType.wx.value,
+                SUB_TYPE: WorkOrderStatus.waitSignin.value,
+                FILENAME: JSON.parse(d).Data[0].Name,
+                FILE_PATH: JSON.parse(d).Data[0].code,
+                CREATE_USER_ID: config.USER_ID
+            };
+            var v_d = {};
+            var api = '';
+            if (app.typeid == TaskType.repair.value) {
+                app.data_v.REPORT_TIME = g.formatDate('D', 'YMDHMS');
+                app.data_v.BOOK_TIME = g.formatDate('D', 'YMDHMS');
+                app.data_v.ACCEPT_USER_ID = config.USER_ID;
+                v_d = app.data_v;
+                api = config.SignRepair;
+            } 
+            if (g.getNetStatus()) {
+                g.ajax(config.AddBillFile, {
+                    data: v_f,
+                    success: function (data) {
+                        document.getElementById("btnSubmit").disabled = false;
+                        if (data && data.Data != '1') {
+                            mui.toast('文件上传失败');
+                        } else if (data && data.Data != 0) {
+                            addData(api, v_d);
+                        }
+                    }
+                });
+            }
+            else {//无网
+                //_database.remove(smp_tb.img_tb, "where BILL_NO='" + app.data_v.NO + "' and SUB_TYPE=='B'");
+                if (fullLocalImgUrl == "") {
+                    document.getElementById("btnSubmit").disabled = false;
+                    mui.toast("请重新选择图片");
+                    return;
+                }
+                //添加签到图片
+                var imgobj = {  NO: app.data_v.NO, SUB_TYPE: 'B', BUSINESS_TYPE: 'R', localImgUrl: localImgUrl, fullLocalImgUrl: fullLocalImgUrl,imgblog: null};
+                console.log('imgobj:' + JSON.stringify(imgobj));
+                //g.setBase64Img(fullLocalImgUrl, imgobj, function (_img) {
+                _database.addBlob(smp_tb.img_tb, [imgobj], 5, true, function (res) {
+                    console.log("img签到res:" + res)
+                    });
+                //});
+                console.log("v_d：" + JSON.stringify(v_d));
+                _database.add(smp_tb.signin_tb, [v_d], function (ares) {
+                    console.log('ares:' + ares);
+                });
+                //本地修改工单状态、更新签到时间
+                _database.update(smp_tb.repair_tb, 'NO', app.data_v.NO, { "STATE": "C", "SIGN_TIME": g.operationDate(0) }, function (ures) {
+                    console.log("ures:" + ures);
+                    mui.toast('离线签到成功！');
+                    if (app.page == 'home') {
+                        curView.close();
+                        g.goPrePrePage(wo, ppView, null, function () {
+                            ppView.evalJS("refleshView(0,'" + app.data_v.NO + "','" + WorkOrderStatus.waitOver.value + "','" + app.typeid + "');");
+                        });
+                    } else {
+                        wo.evalJS("refleshView(0,'" + app.data_v.NO + "','" + WorkOrderStatus.waitOver.value + "','" + app.typeid + "');");
+                    }
+                    g.closeWaiting();
+                    document.getElementById("btnSubmit").disabled = false;
+                    setTimeout(mui.back(), 300);
+                });
+            }
+            console.log('api:' + api);
+        }
+
+        function addData(api, v_d) {
+            g.ajax(api, { 
+                data: v_d,
+                success: function (data) {
+                    if (data.Data == 1) {
+                        mui.toast('操作成功');
+                        if (app.page == 'home') {
+                            curView.close();
+                            g.goPrePrePage(wo, ppView, null, function () {
+                                ppView.evalJS("refleshView(0,'" + app.data_v.NO + "','" + WorkOrderStatus.waitOver.value + "','" + app.typeid + "');");
+                            });
+                        } else {
+                            wo.evalJS("refleshView(0,'" + app.data_v.NO + "','" + WorkOrderStatus.waitOver.value + "','" + app.typeid + "');");
+                        }
+                        plus.nativeUI.closeWaiting();
+                        setTimeout(mui.back(), 300);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

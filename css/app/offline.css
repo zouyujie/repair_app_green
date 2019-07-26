@@ -1,0 +1,50 @@
+﻿.portrait-clockin{width: 50px;height: 50px;margin: 0px;position: fixed;bottom: 25px;left: 50%;margin-left: -23px;z-index: 9999;}
+/*上班打卡 水波纹效果*/
+a.dot:active,a.dot2:active,a.dot3:active{background: #70a236;}
+.dot {
+  animation: sploosh 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  -webkit-animation:sploosh 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.dot2 {
+  animation: sploosh2 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+   -webkit-animation:sploosh2 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.dot3 {
+  animation: sploosh3 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  -webkit-animation:sploosh3 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.dot ul{margin: 0px;padding: 0px;width: 100%;margin: 0.65rem 0px;}
+.dot li{width: 100%;font-size: 0.48rem;line-height: 0.5rem;height: 0.5rem;}
+.dot li.one{font-size: 0.4rem;line-height: 0.8rem;height: 0.8rem;}
+.dot,.dot2,.dot3{
+  height: 46px;width: 46px;
+  font-size: 20px;color: #fff;line-height: 96px;text-align: center;border-radius: 100%;
+  position: absolute;z-index: 1;animation-iteration-count:infinite;
+  -webkit-animation-iteration-count:infinite;background: transparent;
+}
+@keyframes sploosh {
+  0% {box-shadow: 0 0 0 0px rgba(158, 203, 244, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {box-shadow: 0 0 0 10px rgba(158, 203, 244, 0);background: rgba(84, 166, 240, 0);}
+}
+@keyframes sploosh2 {
+  0% { box-shadow: 0 0 0 0px rgba(110, 179, 243, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {box-shadow: 0 0 0 6px rgba(110, 179, 243, 0);background: rgba(84, 166, 240, 0.3);}
+}
+@keyframes sploosh3 {
+  0% {box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {box-shadow: 0 0 0 2px rgba(255, 255, 255, 0); background: rgba(84, 166, 240, 1);}
+}
+
+@-webkit-keyframes sploosh {
+  0% {-webkit-box-shadow: 0 0 0 0px rgba(158, 203, 244, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {-webkit-box-shadow: 0 0 0 10px rgba(158, 203, 244, 0);background: rgba(84, 166, 240, 0);}
+}
+@-webkit-keyframes sploosh2 {
+  0% {-webkit-box-shadow: 0 0 0 0px rgba(110, 179, 243, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {-webkit-box-shadow: 0 0 0 6px rgba(110, 179, 243, 0);background: rgba(84, 166, 240, 0.3);}
+}
+@-webkit-keyframes sploosh3 {
+  0% {-webkit-box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7);background: rgba(84, 166, 240, 0.7);}
+  100% {-webkit-box-shadow: 0 0 0 2px rgba(255, 255, 255, 0); background: rgba(84, 166, 240, 1);}
+}
+/*波纹结束*/

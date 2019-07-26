@@ -1,0 +1,94 @@
+.mui-table-view {background-color: #FFFFFF;}
+.mui-table-view-cell {
+    position: relative;overflow: hidden;padding: 9px 15px;-webkit-touch-callout: none;
+}
+ .mui-table-view-cell:after {
+        position: absolute; right: 0;bottom: 0;left: 15px; height: 1px;content: '';
+        -webkit-transform: scaleY(.5);transform: scaleY(.5);background-color: #c8c7cc;
+}
+.mui-placeholder {text-align: right;}
+.mui-icon-extra {
+    font-family: MuiiconSpread;font-size: 24px;font-weight: normal;font-style: normal;
+    line-height: 1;display: inline-block;text-decoration: none;-webkit-font-smoothing: antialiased;
+}
+.iconfont {
+    font-family: "iconfont" !important;font-size: 16px;font-style: normal;
+    -webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;
+}
+.mui-bar .mui-segmented-control{top:0px;height:40px;line-height:40px;}
+.mui-bar-nav{padding:0px;}
+.mui-content{background-color:#F5F5F5;}
+/*搜索*/
+.smp-search {
+    width: 100%;padding: 0 0.5rem;background: #f3f3f3;position: relative;
+}
+.smp-search i {
+    position: absolute;top: 50%;left: 1rem;margin-top: -7px;color: #999;font-size: 14px;
+}
+.smp-search input {
+    width: 90%;height: 1.2rem;line-height: 1.2rem;margin: 0.4rem 0;border-radius: 20px;
+    font-size: 12px;text-indent: .8rem;border: 1px solid #e7e7e7;
+}
+.smp-search a {
+    line-height: 2.2rem;position: absolute;right: 0px;color: #66B96A;font-size: 16px;width: 48px;height: 48px;text-align: center;
+}
+/*.mui-segmented-control.mui-scroll-wrapper .mui-scroll{width:auto;}*/
+.mui-segmented-control.mui-scroll-wrapper .mui-control-item{padding:0;min-width: 86px;}
+.mui-segmented-control .mui-control-item.mui-active{
+   color: #66B96A;border-bottom: 2px solid #66B96A;
+}
+/*明细*/
+.mui-segmented-control .mui-control-item.mui-active {
+    background-color: #FFFFFF;color: #66B96A;
+}
+.mui-segmented-control .mui-control-item {
+    border-left: 0px;line-height: 43px;height: 43px;
+}
+.mui-slider .mui-segmented-control.mui-segmented-control-inverted .mui-control-item.mui-active {
+    color: #66B96A;border-bottom: 2px solid #66B96A;
+}
+.mui-slider .mui-segmented-control.mui-segmented-control-inverted .mui-control-item.mui-active:after{
+	border-style: none;/*width: 70%;border-width: 1px;border-style: solid;border-color: #66B96A;position: relative;
+	bottom: 0px;margin: 0 auto;left: 0%;display: block;content: '';*/
+}
+/*.mui-segmented-control .mui-control-item.mui-active:after {
+	width: 70%;border-width: 1px;border-style: solid;border-color: #66B96A;position: relative;
+	bottom: 0px;margin: 0 auto;left: 0%;display: block;content: '';border-style: solid;
+}*/
+.mui-input-row span.mui-navigate-right {
+    height: 40px;line-height: 40px;margin-left: 0px;color:#999;
+}
+.mui-input-row span.mui-navigate-right.active{color:#000;}
+.mui-input-row label:last-child {width: auto;}
+.mui-segmented-control{background-color:#fff;}
+.equipment{width: 146px;height: 136px;/*width:100%;height:160px;*/}
+.noimg{text-align:center;}
+.icon-noimg{font-size:128px;color:#CCCCCC;}
+.mui-table-view.annual{height:40px;}
+.annual .mui-table-view-cell{ padding: 11px 15px;}
+.mui-table-view.annual:before,.mui-table-view.annual:after{height:0;}
+.mui-input-row label{padding-right:0px;}
+.mui-input-row span:first-child{width: auto;}
+/*年检记录*/
+.smp-content-padded .mui-input-row.first label:last-child{position:absolute;right:15px;}
+.mui-input-group .mui-input-row:last-child::after{height:0px;}
+.bold{font-weight:500;}
+/*维修记录*/
+.smp-list {
+    width: 100%;padding:0;border-bottom: 1px solid #e7e7e7;text-align: center;height: 40px;
+}
+.smp-list .smp-item { display: block;}
+.smp-list span {float: left;display: block;height: 40px;line-height: 40px;
+}
+/*.mui-input-group{background-color:#CCCCCC;}*/
+.mui-input-row span {
+    font-family: 'Helvetica Neue',Helvetica,sans-serif;line-height: 1.1;float: left;padding: 11px 15px;/*width: 35%;*/
+}
+.pname{color: black;font-size: 17px;}
+.orderNo{margin-left: 10px;}
+.right-status{text-align: right;width: auto; color: #8f8f94;position: absolute;right: 30px; height: 20px;line-height: 65px;font-size:14px;}
+.right-status p{color: black;}
+.right-status p.ing{color:#FDC184;}
+.mui-fullscreen .mui-segmented-control~.mui-slider-group{top:88px;}
+/*设备详情*/
+.mui-input-group.no-lpadding .mui-input-row span{padding-left:0px;}

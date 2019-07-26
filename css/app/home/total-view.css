@@ -1,0 +1,36 @@
+﻿.div-pie{height:184px;}
+.div-middle{height:50px;line-height:50px;background-color:#348D7F;}
+.div-middle a {
+    display: block;
+    float: left;
+    line-height: 60px;
+    height:50px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    margin-top: 0rem;
+}
+.chart{height:162px;margin: 0px;padding: 0px;}
+.chartContainer{height: 252px;}
+.vertical-bar p{color:white;}
+.vertical-bar:after {
+    content: ' ';
+    height: 1rem;
+    border-left: 1px solid #66B96A;
+    position: absolute;
+    top: 8px;
+    right: 0;
+}
+.font-Tag{position:absolute;left: 5px;top: -18px;color:white;}
+.spn-txt{font-weight: bold;
+    font-size: 18px;}
+.smp-search-success {
+	width: 100%;text-align: center;color: #999;text-align: left;
+    padding-left: 15px;height: 38px;line-height: 38px;font-size: 12px;background-color: #FFFFFF;
+}
+.smp-search-success span {
+    float: left;
+    font-size: 12px;   
+}
+.rectangle{ margin-top: 10px;}

@@ -1,0 +1,144 @@
+{
+	"index.html": {
+		"href": "index.html",
+		"resources": [
+			"js/mui.min.js",
+			"css/mui.min.css",
+			"pages/home.html",
+			"/js/libs/mock-min.js",
+			"/js/common/mockdata.js",
+			"pages/repair-home.html",
+			"pages/action-home.html",
+			"pages/my.html",
+			"pages/repair-my.html"
+		],
+		"refer": [
+			"pages/home.html",
+			"pages/my.html",
+			"pages/action-home.html",
+			"pages/repair-home.html",
+			"pages/repair-my.html"
+		],
+		"priority": 0
+	},
+	"login.html": {
+		"refer": [
+			"guide.html",
+			"index.html"
+		],
+		"resources": [
+			"/js/libs/mock-min.js",
+			"/js/common/mockdata.js"
+		]
+	},
+	"pages/home.html": {
+		"refer": [
+			"pages/home/task-main.html",
+			"pages/home/comprehensive-operation.html",
+			"pages/home/add-repair-content.html",
+			"pages/home/waitdo-task-main.html",
+			"pages/home/alarm/order-detail.html"
+		],
+		"resources": [
+			"/js/libs/mock-min.js",
+			"/js/common/mockdata.js"
+		]
+	},
+	"pages/home/task-main.html": {
+		"refer": [
+			"pages/home/repair/order-detail.html",
+			"pages/home/maintain/order-detail.html",
+			"pages/home/repair/over-order.html"
+		],
+		"resources": []
+	},
+	"pages/my.html": {
+		"resources": [
+			"img/tab_3.png",
+			"/js/libs/mock-min.js",
+			"/js/common/mockdata.js"
+		],
+		"refer": [
+			"pages/my/setting.html",
+			"pages/my/prize.html",
+			"pages/my/address-book.html",
+			"pages/my/punch-card.html",
+			"pages/my/duty.html",
+			"pages/my/data-center.html",
+			"pages/my/knowledgebase.html",
+			"pages/my/help.html",
+			"pages/my/feedback.html"
+		]
+	},
+	"pages/my/setting.html": {
+		"resources": [
+			"/js/libs/mock-min.js",
+			"/js/common/mockdata.js"
+		],
+		"refer": [
+			"pages/my/about.html"
+		]
+	},
+	"pages/home/waitdo-task-main.html": {
+		"refer": [
+			"pages/home/repair/order-detail.html",
+			"pages/home/repair/over-order.html",
+			"pages/home/polling/order-detail.html"
+		],
+		"resources": []
+	},
+	"pages/action-home.html": {
+		"refer": [
+			"pages/home/repair/order-detail.html",
+			"pages/home/polling/order-detail.html",
+			"pages/home/repair/over-order.html",
+			"pages/home/add-repair-content.html",
+			"pages/home/maintain/order-detail.html"
+		],
+		"resources": [
+			"fonts/mui.ttf"
+		]
+	},
+	"pages/repair-home.html": {
+		"refer": [
+			"pages/home/repair/order-detail.html",
+			"pages/home/add-repair-content.html"
+		],
+		"resources": []
+	},
+	"pages/repair-my.html": {
+		"refer": [
+			"pages/my/setting.html"
+		],
+		"resources": []
+	},
+	"pages/home/repair/order-detail.html": {
+		"refer": [
+			"pages/home/track-record.html",
+			"pages/home/repair/over-order.html",
+			"pages/home/repair/equipments_repair.html"
+		],
+		"resources": []
+	},
+	"pages/my/punch-card.html": {
+		"refer": [
+			"pages/my/my-timesheets.html"
+		],
+		"resources": []
+	},
+	"guide.html": {
+		"refer": [
+			"login.html"
+		]
+	},
+	"pages/home/repair/over-order.html": {
+		"refer": [
+			"pages/home/repair/repair-consumable.html"
+		]
+	},
+	"pages/my/help.html": {
+		"refer": [
+			"pages/home/repair/sure.html"
+		]
+	}
+}

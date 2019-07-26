@@ -1,0 +1,106 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/base.css" />
+		<link rel="stylesheet" href="../../css/app/my/setting.css" />
+	</head>
+
+	<body>
+		<div id="app" class="mui-content bg-white">
+			<div v-show="isEmptyData" class="empty-container" v-cloak>
+				<div class="nodata-info">暂无相关内容</div>
+				<div class="nodata-icon"><span class="mui-icon iconfont icon-wuneirong xl"></span></div>
+			</div>
+			<ul class="mui-table-view" v-show="list.length>0" v-cloak>
+				<li v-for="(item,index) in list" v-bind:class="{'mui-active':!index}" class="mui-table-view-cell mui-collapse">
+					<a class="mui-navigate-right" v-on:tap="getContent(item.ID,index)"><span v-text="index+1"></span>.<span v-text="item.TITLE"></span></a>
+					<div class="mui-collapse-content">
+						<div v-html="item.sys_updatetime"></div>
+						<!--<div class="div-dingcai">
+							<button type="button" class="mui-btn mui-btn-gray mui-btn-outlined">
+								<i class="mui-icon iconfont icon-ding"></i>有用</button>
+						<button type="button" class="mui-btn mui-btn-gray mui-btn-outlined">
+							<i class="mui-icon iconfont icon-cai"></i>没有用</button>
+						</div>-->
+					</div>
+				</li>
+			</ul>
+            <button type="button" v-on:tap="goToSure()" class="mui-btn mui-xbtn-primary">评价测试</button>
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../../js/common/config.js"></script>
+        <script src="../../js/common/webSql.js"></script>
+        <script src="../../js/libs/mock-min.js"></script>
+		<script type="text/javascript" src="../../js/common/global.js"></script>
+        <script src="../../js/common/mockdata.js"></script>
+		<script type="text/javascript">
+			var app = new Vue({
+				el: "#app",
+				data: {
+					isEmptyData: false,
+					list: [],
+					content: ''
+				},
+				mounted: function() {
+					var _self = this;
+					mui.init();
+					g.ajax(config.QueryAppHelpPage, {
+						data: {
+							title: '',
+							content: '',
+							start: 0,
+							end: 100
+						},
+						success: function (data) {
+						    console.log('data:'+JSON.stringify(data))
+							if(data && data.Data.List) {
+								for(var i = 0; i < data.Data.List.length; i++) {
+									data.Data.List[i].sys_updatetime = '';
+									_self.list.push(data.Data.List[i]);
+
+								}
+								if(_self.list.length == 0) {
+									_self.isEmptyData = true;
+								}
+							} else {
+
+								_self.isEmptyData = true;
+							}
+						}
+					});
+				},
+				methods: {
+					getContent: function(id, index) { 
+						if(app.list && app.list[index].sys_updatetime == '') {
+							app.content = '加载中...';
+							g.ajax(config.GetAppHelpById, {
+								data: {
+									id: id
+								},
+								success: function(data) {
+									if(data && data.Data) {
+										app.list[index].sys_updatetime = data.Data.CONTENT;
+									}
+								}
+							});
+						}
+					},
+					goToSure: function () {
+                        g.openWindow({
+                            id: 'sure',
+                            url: '/pages/home/repair/sure.html',
+                            extras: {}
+                        });
+                    }
+				}
+			});
+		</script>
+	</body>
+
+</html>

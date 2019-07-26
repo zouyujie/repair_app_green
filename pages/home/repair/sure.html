@@ -1,0 +1,70 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../../css/base.css" rel="stylesheet" />
+		<link href="../../../css/app/home/work-detail.css" rel="stylesheet" />
+	</head>
+	<body>
+        <div id='app'>
+            <header class="mui-bar mui-bar-nav">
+                <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+                <h1 class="mui-title">评价</h1>
+            </header>
+            <nav class="mui-bar mui-bar-tab">
+                <button id='btnSubmit' class="mui-btn next-btn mui-btn-primary" v-on:tap="btnSubmit(config.JudgeRepair)">评价</button>
+            </nav>
+            <div class="mui-content">
+                <div class="mui-content-wide">
+                    <form class="mui-input-group">
+                        <div class="mui-input-row">
+                            <label><i class="require">*</i>维修结果</label>
+                            <span class="mui-radio mui-left">
+                                <label class="radio-label">已修好</label>
+                                <input name="repairType" id='repairType' value="equipment" type="radio" checked>
+                            </span>
+                            <span class="mui-radio mui-left">
+                                <label class="radio-label">未修好</label>
+                                <input name="repairType" value="facility" type="radio">
+                            </span>
+                        </div>
+                        <div class="mui-input-row">
+                            <label><i class="require">*</i>服务评价</label>
+                            <div class="icons mui-inline" style="margin-left: -10px;">
+                                <i data-index="1" class="mui-icon mui-icon-star"></i>
+                                <i data-index="2" class="mui-icon mui-icon-star"></i>
+                                <i data-index="3" class="mui-icon mui-icon-star"></i>
+                                <i id="star4" data-index="4" class="mui-icon mui-icon-star"></i>
+                                <i data-index="5" class="mui-icon mui-icon-star"></i>
+                                <span id="starInfo">满意</span>
+                            </div>
+                        </div>
+                        <div class="mui-input-row" style="height: 92px;padding: 4px 14px;">
+                            <textarea id="textarea" class="mui-input-clear" rows="4" v-model="data_v.MESSAGE" placeholder="输入完工后的优点和不足吧"></textarea>
+                        </div>
+                        <div class="smp-line"></div>
+                        <div class="smp-desc-info">
+                            <p><i class="require">*</i><span style="font-size: 16px;">手写签名</span>(必填)<button id="clearCanvas" type="button" style="margin-top: 4px;" class="mui-btn mui-xbtn-primary mui-pull-right">重写</button></p>
+                        </div>
+                        <div class="canvaswrap">
+                            <div id="signName">
+                            </div>
+                            <input type="hidden" id="imgUrl" value="" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+		<script src="../../../js/mui.min.js"></script>
+		<script src="../../../js/libs/vue.min.js"></script>
+        <script src="../../../js/libs/canvasSignature.js"></script>
+		<script type="text/javascript" src="../../../js/common/config.js"></script>
+		<script src="../../../js/common/global.js"></script>
+        <script src="../../../js/app/home/sure.js"></script>
+	</body>
+
+</html>

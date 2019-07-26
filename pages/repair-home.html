@@ -1,0 +1,290 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>报修人员-首页</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../css/base.css" />
+		<link rel="stylesheet" href="../css/app/home/work-list.css" />
+	</head>
+
+	<body>
+		<div id="app">
+			<header id="header" class="mui-bar mui-bar-nav action-head" style="height: 80px;">
+				<a class="mui-icon mui-icon-search mui-pull-left" style="color: #348D7F;"></a>
+				<h1 class="mui-title" v-text="title"></h1>
+				<div class="mui-segmented-control" style="margin-top: 0px;">
+					<div class="divHeader no-underline">
+						<a class="mui-control-item" v-on:tap="openOrderStatus()"><span v-text="curStatusName">工单状态</span><i class="mui-icon mui-icon-arrowdown"></i></a>
+						<a class="mui-control-item" v-on:tap="openDateTime()"><span id="spnSltDate">报修时间</span><i class="mui-icon mui-icon-arrowdown"></i></a>
+					</div>
+				</div>
+			</header>
+			<div id="pullrefresh" class="mui-content">
+				<ul id="pullrefreshUl">
+					<li>
+                        <div v-show="isEmptyData" class="empty-container" v-cloak>
+                            <div class="nodata-info">暂无工单信息</div>
+                            <div class="nodata-icon"><span class="mui-icon iconfont icon-gongdan"></span></div>
+                        </div>
+						<div v-if="list.length>0" v-for="(item,index) in list" class="mui-card">
+							<ul class="mui-table-view">
+								<li class="mui-table-view-cell mui-media">
+									<div v-on:tap="open_detail(item)">
+										<div class="mui-card-header">
+											<div><span class="spnOrderNO">工单号：</span><span class="spn-order" v-text="item.orderNumber"></span></div>
+											<div class="font-topright" v-text="getStatusName(item.status)"></div>
+											<div class="triangle-topright" v-bind:class="g.getStatusColorById(item.status)"></div>
+										</div>
+										<div class="mui-media-body">
+											<div class="div-tag">
+												<button type="button" class="mui-btn mui-btn-warning mui-btn-outlined"><span class="mui-icon iconfont icon-jichutubiao_jiangli"></span>奖励 ¥ <span v-text="item.money"> </span></button>
+												<button type="button" class="mui-btn mui-btn-warning mui-btn-outlined"><span v-text="item.hour"> </span>小时完成</button>
+											</div>
+											<div class="floatLeft middle">
+												<span class="fl" v-text="item.title"></span>
+												<span v-if="item.IS_URGENCY==1" class="mui-badge mui-badge-warning floatLeft">紧急</span>
+											</div>
+											<div style="clear: both;"></div>
+											<p class='mui-ellipsis' v-text="item.msg"></p>
+										</div>
+										<div v-if="item.isPast" class="font-seal">已过期</div>
+                                        <div v-if="item.IS_WAITING==1" class="font-seal">待料</div>
+									</div>
+									<div class="mui-card-footer">
+										<span v-text="item.datetime"></span>
+										<button type="button" v-if="item.status==WorkOrderStatus.waitAudit.value&&item.CREATE_USER_ID==config.USER_ID" class="mui-btn mui-xbtn-primary" v-on:tap="audit(item)">评价</button>
+										<button type="button" v-if="item.status==WorkOrderStatus.waitOrder.value&&item.CREATE_USER_ID==config.USER_ID" class="mui-btn mui-xbtn-primary" v-on:tap="reminderOrder(item)" v-text="ctrlReminderOrderTxt(item)"></button>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<!--报修时间-->
+			<div id="repair-datetime" class="mui-popover mui-popover-action">
+				<ul class="mui-table-view mui-table-view-radio">
+					<li class="mui-table-view-cell mui-selected" v-on:tap="sltRepairDate(-365)">
+						<a class="mui-navigate-right">
+							全部
+						</a>
+					</li>
+					<li class="mui-table-view-cell" v-on:tap="sltRepairDate(0)">
+						<a class="mui-navigate-right">
+							今天
+						</a>
+					</li>
+					<li class="mui-table-view-cell" v-on:tap="sltRepairDate(-7)">
+						<a class="mui-navigate-right">
+							本周
+						</a>
+					</li>
+					<li class="mui-table-view-cell" v-on:tap="sltRepairDate(-30)">
+						<a class="mui-navigate-right">
+							本月
+						</a>
+					</li>
+				</ul>
+				 <div class="divFooter">
+                <input id="txtStartDate" data-options='{"type":"date"}' type="text" readonly="readonly" /><span>至</span><input id="txtEndDate" data-options='{"type":"date"}' type="text" readonly="readonly" />
+                <button v-on:tap="sltRepairDate(-1)"class="mui-btn mui-xbtn-primary">确认</button>
+            </div>
+			</div>
+		</div>
+		<div id="repair-ways" class="mui-popover mui-popover-bottom mui-popover-action">
+			<!-- 可选择菜单 -->
+			<ul class="mui-table-view mui-grid-view mui-grid-9">
+				<li class="mui-table-view-cell mui-media mui-col-xs-12">
+					<span>报修方式</span>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bor-noright">
+					<a href="#" id="btnTextRepair">
+						<span class="mui-icon iconfont icon-bianji"></span>
+						<div class="mui-media-body">文字</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6">
+					<a href="#" id="btnSama">
+						<span class="mui-icon iconfont icon-saoma"></span>
+						<div class="mui-media-body">扫一扫</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-12 p-notop">
+					<a href="#repair-ways" class="p-notop"><span class="mui-icon mui-icon-closeempty"></span></a>
+				</li>
+			</ul>
+		</div>
+
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../js/libs/vue.min.js"></script>
+		<script type="text/javascript" src="../js/libs/mui.picker.min.js"></script>
+		<script type="text/javascript" src="../js/common/config.js"></script>
+        <script src="../js/common/webSql.js"></script>
+        <script src="../js/libs/mock-min.js"></script>
+        <script type="text/javascript" src="../js/common/global.js"></script>
+        <script src="../js/common/mockdata.js"></script>
+        <script type="text/javascript" src="../js/common/web-storage-cache.js"></script>
+		<script type="text/javascript" src="../js/app/home/work-list.js"></script>
+
+		<script type="text/javascript">
+			var app = new Vue({
+				el: "#app",
+				data: app_Data,
+				methods: {
+				    //控制催单按钮文本
+				    ctrlReminderOrderTxt:function(item){
+				        return (item.PRESS_NUM==undefined|| item.PRESS_NUM==0)?'催单':'已催单';
+				    },
+					//选择报修日期
+					sltRepairDate: function(id) {
+					    mui('#repair-datetime').popover('hide');
+					 	 getListBySltRepairDate(id,g.id('txtStartDate').value,g.id('txtEndDate').value);
+					},
+					//根据ID获取状态名
+					getStatusName: function(statusid) {
+					    return g.getStatusNameById(statusid, true);
+					},
+					//审核评价
+					audit: function(item) {
+						var _url = 'home/repair/sure.html';
+						g.openWindow({
+							id: 'repair_sure',
+							url: _url,
+							extras: {
+							NO: item.orderNumber,
+								typeid: app.typeid,
+								tag: ''
+							}
+						});
+					},
+					//打开详情页面
+					open_detail: function(item) {
+						open_detailFun(item);
+					},
+					//根据类型获取任务列表
+					getTaskList: function() {
+					    getTaskListFun(app.typeid, 'home/','repair');
+					},
+					//报修
+					addRepair: function() {
+					    mui('#repair-ways').popover('show');
+					},
+					//工单状态
+					openOrderStatus: function() {
+					    openOrderStatusFun('action');
+					},
+					//选择时间
+					openDateTime: function() {
+						window.scrollTo(1, 1); //解决picker和下拉刷新同时存在的bug，picker显示时不执行下拉刷新
+						mui('#repair-datetime').popover('toggle');
+					},
+					//催单
+					reminderOrder: function(item) {
+						g.ajax(config.RepairBillPress, {
+							data: {
+								NO: item.orderNumber,
+								ORG_CODE: config.ORG_CODE
+							},
+							success: function(data) {
+								if(data.StatusCode == '200' && data.Data == '1') {
+									mui.toast('催单成功');
+									app.list = toList(_self.typeid);
+								} else {
+									mui.toast('催单失败');
+								}
+							}
+						});
+					}
+				},
+				mounted: function() {
+					var _self = this;
+					_self.title = config.appTitle;
+					_self.typeid = TaskType.repair.value; //维修
+				    //注意：若为ajax请求，则需将如下代码放在处理完ajax响应数据之后；
+					mui.ready(function () {
+					    eventListener();
+					    //getListAll('repair');
+					    //g.closeWaiting();//关闭等待框
+					});
+				    mui.plusReady(function () {
+				        app.getTaskList();
+				    })
+				}
+			});
+
+			function eventListener() { //文字报修
+				var btnTextRepair = document.getElementById('btnTextRepair');
+				if(btnTextRepair) {
+					btnTextRepair.addEventListener('tap', function() {
+					    mui('#repair-ways').popover('hide');
+					    g.openWindowWithTitle({
+							url: 'home/add-repair-content.html',
+							id: "add-repair-content"
+						},'填写报修内容');
+					})
+				}
+				//扫码
+				var btnSama = document.getElementById('btnSama');
+				if(btnSama) {
+					btnSama.addEventListener('tap', function() {
+					    mui('#repair-ways').popover('hide');
+						g.openWindowWithTitle({
+							url: 'home/barcode-scan.html',
+							id: "barcode-scan"
+						}, '二维码扫描');
+					})
+				}
+				dateInitEvent();
+			}
+			//二维码扫描后的回调（类型、结果、文件）
+			function scaned(t, r, f) {
+				console.log('r:' + r);
+				var res = "{" + r + "}";
+				var jsonRes = JSON.parse(res);
+				//二维码报修
+				g.openWindowWithTitle({
+					url: 'home/add-repair-content.html',
+					id: "add-repair-content",
+					extras: {
+					    buildInfo: jsonRes
+					}
+				},'填写报修内容');
+				//mui('#repair-ways').popover('hide');
+			}
+			//回调更新,刷新界面(增减工单数，工单号，状态值）
+			function refleshView(val, no, status) {
+			    console.log(val + "," + no + "," + status);
+			    if (no) {
+			        if (status && app.list.length > 0) {
+			            var curOrder = null;
+			            if (status == 'DL') {
+
+			            } else {
+			                for (var i = 0; i < app.list.length; i++) {
+			                    if (no == app.list[i].orderNumber) {
+			                        curOrder = app.list[i];
+			                        curOrder.status = status;
+			                        if (status == WorkOrderStatus.waitSignin.value) {//如果是抢单操作
+			                            curOrder.ACCEPT_USER_ID = config.USER_ID
+			                        }
+			                        //console.log('这里：' + JSON.stringify(curOrder))
+			                        Vue.set(app.list, i, curOrder);
+			                        break;
+			                    }
+			                }
+			            }
+			        }
+			    }
+			}
+			//显示报修弹出层
+			function showRepair() {
+			    mui('#repair-ways').popover('show');
+			}
+		</script>
+	</body>
+
+</html>
