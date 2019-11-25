@@ -6,16 +6,10 @@
 ### 技术
 MUI、Vue2.x、HTML5+
 ### 界面效果
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200802333-483048771.png" width="352" height="627">
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200824220-2017694299.png" width="352" height="627">
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200831891-1383343526.png" width="352" height="627">
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200837920-639185538.png" width="352" height="627">
-
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200901374-1334813786.png" width="352" height="627">
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200849207-1814017595.png" width="352" height="627">
-
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200912565-477534475.png" width="352" height="627">
-<img src="https://img2018.cnblogs.com/blog/413851/201905/413851-20190521200952299-1206993719.png" width="352" height="627">
+<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/1.jpg" width="352" height="627">
+<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/2.png" width="352" height="627">
+<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/3.jpg" width="352" height="627">
+<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/4.jpg" width="352" height="627">
 <h3>图书购买地址</h3>
 <br/><a href="https://item.jd.com/12521607.html" target="_blank">
 <img src="https://www.cnblogs.com/images/cnblogs_com/jiekzou/780174/o_e.png" style=" border:2px solid #ddd;border-radius:20px;" height="326" width="235">
