@@ -16,3 +16,9 @@ MUI、Vue2.x、HTML5+
 </a>
 <br/>
 <a href="https://item.jd.com/12521607.html" target="_blank">https://item.jd.com/12521607.html</a>
+### 角色账号密码
+项目经理:4403001
+班组长:4403006
+维修人员：4403007
+报修人员：4403010
+密码统一：123456
