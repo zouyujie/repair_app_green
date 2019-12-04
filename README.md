@@ -6,10 +6,10 @@
 ### 技术
 MUI、Vue2.x、HTML5+
 ### 界面效果
-<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/1.jpg" width="352" height="627">
-<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/2.png" width="352" height="627">
-<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/3.jpg" width="352" height="627">
-<img src="https://github.com/zouyujie/repair_app_green/tree/master/screenshot/4.jpg" width="352" height="627">
+<img src="https://raw.githubusercontent.com/zouyujie/repair_app_green/master/screenshot/1.jpg" width="352" height="627">
+<img src="https://raw.githubusercontent.com/zouyujie/repair_app_green/master/screenshot/2.png" width="352" height="627">
+<img src="https://raw.githubusercontent.com/zouyujie/repair_app_green/master/screenshot/3.jpg" width="352" height="627">
+<img src="https://raw.githubusercontent.com/zouyujie/repair_app_green/master/screenshot/4.jpg" width="352" height="627">
 <h3>图书购买地址</h3>
 <br/><a href="https://item.jd.com/12521607.html" target="_blank">
 <img src="https://www.cnblogs.com/images/cnblogs_com/jiekzou/780174/o_e.png" style=" border:2px solid #ddd;border-radius:20px;" height="326" width="235">
